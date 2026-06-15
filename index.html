@@ -45,6 +45,9 @@ const ALERTAS=[
   {u:"alto",t:"Regulamentação IS (Imposto Seletivo)",d:"Pendente para vários setores. Empresas com insumos sujeitos ao IS (embalagens, energia, veículos) devem monitorar portarias setoriais.",p:"A definir"},
   {u:"medio",t:"Benefícios Fiscais Estaduais ICMS",d:"A partir de 2028 o ICMS começa a ser reduzido. Benefícios atrelados ao ICMS perdem base. Financeiro deve mapear e negociar alternativas antes de 2027.",p:"Até 2027"},
   {u:"medio",t:"Regimes Específicos (Combustíveis, Financeiro, Imóveis)",d:"LC 214/2025 prevê regimes diferenciados ainda em elaboração. Não projetar com base no regime geral para esses segmentos.",p:"2026–2027"},
+  {u:"critico",t:"Cadastro de produtos/NCM — risco silencioso em 2026",d:"Erros de NCM, descrição genérica ou vínculo incorreto entre item e tributação contaminam simultaneamente IBS e CBS. Um erro que antes afetava um tributo agora se replica em cadeia. Com 2026 sendo o ano de calibragem do sistema, quem não ajustar o cadastro agora chega a 2027 com base tributária incorreta. Fonte: e-Auditoria, mai/2026.",p:"Até ago/2026"},
+  {u:"alto",t:"Precificação precisa ser revisada em 2026 — não em 2027",d:"Mesmo sem recolhimento efetivo, IBS e CBS já afetam base de cálculo, créditos e margens. Contratos, tabelas de preço e política comercial baseados no sistema atual podem gerar perda de margem ao virar 2027. 2026 é a janela para simular e calibrar. Fonte: RDD10+/Roberto Dias Duarte, mai/2026.",p:"2º sem/2026"},
+  {u:"alto",t:"Créditos apurados em 2026 não são ressarcíveis em 2027",d:"Art. 465 do Decreto 12.955/2026: saldo a recuperar em 31/12/2026 decorrente da apuração de 2026 será desconsiderado a partir de jan/2027 e não será objeto de ressarcimento. Empresas que apurarem créditos de CBS/IBS em 2026 não poderão recuperá-los. Fonte: Souto Correa, mai/2026.",p:"31/12/2026"},
   {u:"critico",t:"NF-e/NFC-e: campos IBS/CBS obrigatórios a partir de ago/2026",d:"NT 2025.002-RTC v1.36: a partir de 03/08/2026, preenchimento de IBS e CBS é obrigatório em produção para Lucro Real e Lucro Presumido (CRT=3). Sistemas emissores e ERPs devem estar adaptados. Simples Nacional: prazo até jan/2027. Fonte: NT 2025.002 / Portal DFe.",p:"03/08/2026"},
   {u:"critico",t:"Split Payment: início efetivo NÃO é jan/2027",d:"Decreto 12.955/2026 e especialistas confirmaram: o split não começa em janeiro de 2027. O cronograma exato por arranjo de pagamento (Pix, boleto, cartão) ainda será definido por ato conjunto RFB/CGIBS. Empresas não devem planejar como se jan/2027 fosse a data de virada. Fonte: CRCMA/Diário do Comércio, mai/2026.",p:"A confirmar"},
 
@@ -370,6 +373,65 @@ Impacto prático: o financeiro passa a receber NF − CBS − IBS. Toda projeç�
         )
       )
     ,16),
+    // PENALIDADES
+    Sec("⚖️ Penalidades — O que a Lei Prevê",
+      h("div",null,
+        h("div",{style:{background:"#FFF8EC",border:"1.5px solid #F0A500",borderRadius:8,padding:"10px 14px",fontSize:".68rem",color:"#7a5200",marginBottom:14,lineHeight:1.6}},
+          "⚠️ Em 2026: sem multa imediata — ano pedagógico. Se lavrado auto de infração, empresa tem 60 dias para corrigir e penalidade é extinta sem multa (LC 227/2026, art. 348 §§3º e 4º). A partir de 2027: regime sancionatório pleno entra em vigor."
+        ),
+        h("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:9}},
+          [
+            {nivel:"critico",titulo:"NF-e emitida sem destaque de IBS/CBS",
+             quando:"Emissor de NF-e não atualiza o sistema para incluir os campos obrigatórios de IBS/CBS após ago/2026. Fornecedor recusa a nota — venda travada ou crédito do comprador cancelado.",
+             base:"Até 20% do valor da operação por nota irregular",
+             agrav:"Até 30% com reincidência, fraude ou dolo",
+             prazo:"A partir de 03/08/2026",fonte:"STF Tema 487 / NT 2025.002 / LC 227/2026"},
+            {nivel:"critico",titulo:"Crédito de IBS/CBS aproveitado sem direito",
+             quando:"Empresa registra crédito de IBS/CBS de NF-e com erro, de fornecedor irregular ou de operação não sujeita ao tributo. O Fisco detecta na apuração e estorna com multa.",
+             base:"Estorno integral do crédito + multa sobre o valor indevido",
+             agrav:"Majoração de 50% em reincidência — pode chegar a 150%",
+             prazo:"A partir de jan/2027",fonte:"LC 227/2026, art. 341-G, XV"},
+            {nivel:"alto",titulo:"Não cadastramento no CGIBS",
+             quando:"Empresa não registra domicílio bancário no CGIBS para receber o líquido do split payment. O sistema não consegue segregar o tributo corretamente e o valor pode ficar bloqueado ou ser retido em excesso.",
+             base:"Multa fixa em UPF: R$ 200/unidade por evento, corrigido pelo IPCA anualmente",
+             agrav:"Cumulável por filial não cadastrada — grupos multimarca têm risco amplificado",
+             prazo:"A partir de 2026",fonte:"LC 214/2025, art. 341-C / Ato Conjunto RFB/CGIBS nº 02/2026"},
+            {nivel:"alto",titulo:"Dupla autuação — tributo + obrigação acessória",
+             quando:"Mesma NF-e irregular pode gerar dois autos simultâneos: um pelo tributo não recolhido e outro pela obrigação acessória descumprida. A LC 214/2025 permite ambos para a mesma situação.",
+             base:"Dois autos independentes — valores somados sobre a mesma operação",
+             agrav:"Contestado juridicamente (STF Tema 487), mas legislação ainda permite a cumulação",
+             prazo:"A partir de jan/2027",fonte:"LC 214/2025, art. 331 / LC 227/2026"},
+            {nivel:"medio",titulo:"Sonegação, fraude ou conluio",
+             quando:"Empresa omite operações sujeitas a IBS/CBS, declara valores menores do que os reais ou constrói esquema para reduzir artificialmente a base de cálculo.",
+             base:"Até 100% do tributo de referência",
+             agrav:"Até 150% em caso de reincidência específica",
+             prazo:"A partir de jan/2027",fonte:"STF Tema 863 / LC 227/2026"},
+            {nivel:"ok",titulo:"2026: Período pedagógico — use a seu favor",
+             quando:"Em 2026, se lavrado auto de infração por obrigação acessória de IBS/CBS, a empresa recebe notificação com 60 dias para corrigir. Se corrigir no prazo, a penalidade é extinta sem multa. É a janela para ajustar sistemas, cadastros e processos sem custo.",
+             base:"Notificação + 60 dias para correção = penalidade extinta",
+             agrav:"Após jan/2027 não há mais esse benefício — regime pleno entra em vigor",
+             prazo:"Todo 2026",fonte:"LC 227/2026, art. 348 §§3º e 4º / Ato Conjunto RFB/CGIBS nº 1/2025"},
+          ].map((p,i)=>h("div",{key:i,style:{background:"#fff",borderRadius:9,padding:"12px 14px",border:"1.5px solid #D1DCF0",
+            borderLeft:"4px solid "+(p.nivel==="critico"?"#D32F2F":p.nivel==="alto"?"#F0A500":p.nivel==="medio"?"#3972B4":"#1E7E4A"),
+            display:"flex",flexDirection:"column",gap:4}},
+            h("div",{style:{fontSize:".54rem",fontWeight:700,letterSpacing:1,textTransform:"uppercase",
+              color:p.nivel==="critico"?"#D32F2F":p.nivel==="alto"?"#F0A500":p.nivel==="medio"?"#3972B4":"#1E7E4A"}},
+              p.nivel==="critico"?"🔴 Risco Crítico":p.nivel==="alto"?"🟡 Risco Alto":p.nivel==="medio"?"🔵 Risco Médio":"✅ Oportunidade"),
+            h("div",{style:{fontSize:".78rem",fontWeight:700,color:"#1A3F6F",marginBottom:2}},p.titulo),
+            h("div",{style:{fontSize:".68rem",color:"#4D4D4F",lineHeight:1.5,marginBottom:4,fontStyle:"italic"}},p.quando),
+            h("div",{style:{fontSize:".68rem",color:"#4D4D4F",lineHeight:1.5}},
+              h("span",{style:{fontWeight:700,color:"#1A3F6F"}},"💰 Multa: "),p.base),
+            h("div",{style:{fontSize:".68rem",color:"#4D4D4F",lineHeight:1.5}},
+              h("span",{style:{fontWeight:700,color:"#D32F2F"}},"⚠️ Agravante: "),p.agrav),
+            h("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginTop:4}},
+              h("span",{style:{fontSize:".6rem",fontWeight:700,color:"#1A3F6F",background:"#EEF3FA",padding:"2px 7px",borderRadius:3}},"📅 "+p.prazo),
+              h("span",{style:{fontSize:".58rem",color:"#888",background:"#F7F7F7",padding:"2px 6px",borderRadius:3,fontStyle:"italic"}},"📋 "+p.fonte)
+            )
+          ))
+        )
+      )
+    ,16),
+
     // RISCOS
     Sec("⚡ Riscos de Não se Preparar — Impacto Financeiro",
       h("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:9}},
