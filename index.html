@@ -31,7 +31,7 @@ const CHIPS=[
 ];
 
 const TL=[
-  {ano:"2026",status:"Em curso",tipo:"ativo",desc:"Testes Split Payment alíquota simbólica (~1%). IBS+CBS em teste (0,1%+0,9%). Manual de Integração v1.0 publicado 03/06/2026. Sem cobrança efetiva — validação tecnológica e cadastral.",tags:["Manual Split Payment publicado","Regulamentação IS pendente","Cadastro IBS em andamento"]},
+  {ano:"2026",status:"Em curso",tipo:"ativo",desc:"Testes Split Payment alíquota simbólica (~1%). IBS+CBS em teste (0,1%+0,9%). Manual de Integração v1.0 publicado 03/06/2026. Sem cobrança efetiva — validação tecnológica e cadastral.",tags:["Manual Split Payment publicado (03/06/2026)","NF-e: campos IBS/CBS obrigatórios ago/2026","Sem recolhimento efetivo — ano informativo"]},
   {ano:"2027",status:"Próximo",tipo:"proximo",desc:"CBS plena em vigor. Extinção do PIS/Cofins. Split Payment facultativo no B2B com crédito garantido. IBS em alíquota reduzida. ERP deve estar adaptado.",tags:["Extinção PIS/Cofins","CBS plena obrigatória","Split B2B facultativo"]},
   {ano:"2028",status:"A definir",tipo:"futuro",desc:"IBS obrigatório B2B. Início redução ICMS/ISS em 20% ao ano. Split obrigatório em novos meios. Regimes específicos definidos por lei complementar.",tags:["IBS obrigatório B2B","-20% ICMS/ISS (1ª parcela)","Novos regimes específicos"]},
   {ano:"2029–32",status:"Transição",tipo:"futuro",desc:"Redução contínua ICMS/ISS (-20%/ano). Apuração dual — período crítico. Créditos acumulados de ICMS em risco de perda.",tags:["-40% a -80% ICMS/ISS","Créditos acumulados ICMS","Benefícios fiscais extinção"]},
@@ -45,6 +45,10 @@ const ALERTAS=[
   {u:"alto",t:"Regulamentação IS (Imposto Seletivo)",d:"Pendente para vários setores. Empresas com insumos sujeitos ao IS (embalagens, energia, veículos) devem monitorar portarias setoriais.",p:"A definir"},
   {u:"medio",t:"Benefícios Fiscais Estaduais ICMS",d:"A partir de 2028 o ICMS começa a ser reduzido. Benefícios atrelados ao ICMS perdem base. Financeiro deve mapear e negociar alternativas antes de 2027.",p:"Até 2027"},
   {u:"medio",t:"Regimes Específicos (Combustíveis, Financeiro, Imóveis)",d:"LC 214/2025 prevê regimes diferenciados ainda em elaboração. Não projetar com base no regime geral para esses segmentos.",p:"2026–2027"},
+  {u:"critico",t:"NF-e/NFC-e: campos IBS/CBS obrigatórios a partir de ago/2026",d:"NT 2025.002-RTC v1.36: a partir de 03/08/2026, preenchimento de IBS e CBS é obrigatório em produção para Lucro Real e Lucro Presumido (CRT=3). Sistemas emissores e ERPs devem estar adaptados. Simples Nacional: prazo até jan/2027. Fonte: NT 2025.002 / Portal DFe.",p:"03/08/2026"},
+  {u:"critico",t:"Split Payment: início efetivo NÃO é jan/2027",d:"Decreto 12.955/2026 e especialistas confirmaram: o split não começa em janeiro de 2027. O cronograma exato por arranjo de pagamento (Pix, boleto, cartão) ainda será definido por ato conjunto RFB/CGIBS. Empresas não devem planejar como se jan/2027 fosse a data de virada. Fonte: CRCMA/Diário do Comércio, mai/2026.",p:"A confirmar"},
+
+  {u:"alto",t:"2026 é ano informativo — sem desembolso de IBS/CBS",d:"Art. 348 da LC 214/2025 e Comunicado Conjunto CGIBS/RFB nº 01/2025 confirmam: em 2026, IBS e CBS devem ser calculados e destacados na NF-e, mas não há recolhimento efetivo. O valor pago no teste (~1%) é compensado com PIS/Cofins. Carga tributária total permanece inalterada. Fonte: TOTVS/Comunicado CGIBS/RFB.",p:"Todo 2026"},
 ];
 
 const IMPACTOS=[
@@ -121,9 +125,11 @@ function App(){
   const STATIC_RESPOSTAS={
     prazos:`Prazos críticos para o financeiro se preparar:
 
-▸ Jun/2026 — Manual de Integração Split Payment v1.0 publicado. TI/ERP deve avaliar imediatamente os 6 campos de liquidação e os 3 modos operacionais.
+▸ 03/06/2026 — Manual de Integração Split Payment v1.0 publicado. Ato Conjunto RFB/CGIBS nº 02/2026. TI/ERP deve avaliar imediatamente os 6 campos de liquidação e os 3 modos operacionais.
 ▸ 2026 — Confirmar cadastro CGIBS (Ato Conjunto RFB/CGIBS nº 02/2026). Filiais mesma raiz CNPJ precisam de atenção no domicílio bancário.
-▸ Jan/2027 — Extinção do PIS/Cofins. CBS entra em vigor plena. ERP deve estar parametrizado. Revisão de contratos e fornecedores necessária antes dessa data.
+▸ 03/08/2026 — Campos IBS/CBS obrigatórios na NF-e/NFC-e para Lucro Real e Lucro Presumido (NT 2025.002 v1.36). ERPs devem estar adaptados.
+▸ Jan/2027 — Extinção do PIS/Cofins. CBS entra em vigor plena. Revisão de contratos e fornecedores necessária antes dessa data.
+▸ Atenção: split payment efetivo NÃO começa necessariamente em jan/2027 — cronograma por arranjo de pagamento será definido por ato conjunto RFB/CGIBS.
 ▸ 2º semestre 2027 — Split Payment efetivo no B2B (início facultativo). Empresas com vendas a prazo devem ter projeções de fluxo de caixa refeitas.
 ▸ 2028 — IBS obrigatório no B2B. Início da redução do ICMS/ISS em 20% ao ano. Split obrigatório em novos meios de pagamento.
 ▸ 2028–2032 — Período de apuração dual (ICMS + IBS). Maior complexidade de compliance. Créditos acumulados de ICMS em risco de perda.
@@ -453,7 +459,7 @@ Impacto prático: o financeiro passa a receber NF − CBS − IBS. Toda projeç�
           "· "+f.l
         ))
       ),
-      h("div",{style:{borderTop:"1px solid #2E588C",paddingTop:7,fontSize:".55rem",color:"#7a9cc4"}},"Monitor Reforma Tributária · Grupo Veste · Atualizado em Jun/2026 · Conteúdo baseado em fontes oficiais e especializadas — não constitui assessoria jurídica ou tributária.")
+      h("div",{style:{borderTop:"1px solid #2E588C",paddingTop:7,fontSize:".55rem",color:"#7a9cc4"}},"Monitor Reforma Tributária · Grupo Veste · Atualizado em 15/Jun/2026 · Conteúdo baseado em fontes oficiais e especializadas — não constitui assessoria jurídica ou tributária.")
     )
   );
 }
