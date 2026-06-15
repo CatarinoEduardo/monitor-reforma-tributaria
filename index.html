@@ -285,7 +285,6 @@ Impacto prático: o financeiro passa a receber NF − CBS − IBS. Toda projeç�
         ]
       )
     ),
-
     // CRONOGRAMA
     Sec("📅 Cronograma da Reforma",
       h("div",{style:C.tlWrap},
@@ -342,6 +341,35 @@ Impacto prático: o financeiro passa a receber NF − CBS − IBS. Toda projeç�
       )
     ),
 
+    // CONVERGÊNCIA
+    Sec("✅ O que Continua Igual — Pontos de Convergência",
+      h("div",null,
+        h("div",{style:{fontSize:".68rem",color:"#888",marginBottom:12}},"O que já existe hoje e funciona a favor da empresa na virada para o novo modelo."),
+        h("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:8}},
+          [
+            {icone:"🏦",t:"Liquidação centralizada na conta da matriz",d:"Sim — o Manual de Integração v1.0 prevê que o domicílio bancário pode ser configurado na matriz, independentemente de qual filial emitiu a NF-e. O grupo registra uma conta única no CGIBS para receber o líquido de todas as filiais da mesma raiz CNPJ. Ação: confirmar o cadastro de domicílio bancário no CGIBS antes de 2027.",ok:true},
+            {icone:"📄",t:"NF-e e NFC-e continuam sendo a base",d:"Os documentos fiscais eletrônicos que a empresa já emite hoje (NF-e, NFC-e) continuam sendo o elo central do sistema. O split payment apenas acrescenta novos campos de vinculação ao XML — o processo de emissão não muda estruturalmente.",ok:true},
+            {icone:"💳",t:"Pix, boleto e cartão continuam sendo os meios",d:"Os meios de pagamento atuais são exatamente os canais do split: Pix, boleto, TEF, TED e cartões. Não há necessidade de adotar novos meios — os PSPs (bancos, gateways) que já processam esses pagamentos serão responsáveis pela segregação automática.",ok:true},
+            {icone:"📊",t:"Não-cumulatividade mantida — crédito garantido",d:"A lógica de crédito tributário nas compras (insumos, mercadorias para revenda) é mantida no IBS e na CBS. O que muda é o mecanismo: o crédito passa a ser financeiro (confirmado após o pagamento), não apenas escritural. Para quem já apura crédito de PIS/Cofins, a lógica base é familiar.",ok:true},
+            {icone:"🔄",t:"Antecipação de recebíveis não muda o momento da retenção",d:"Decreto 12.955/2026 (art. 31, III) confirmou: quando a empresa antecipa recebíveis (banco, securitizadora, FIDC), o split continua ocorrendo no calendário original do cliente final — não na data da antecipação. A operação de antecipação segue como hoje.",ok:true},
+            {icone:"🧾",t:"SPED e escrituração contábil seguem o mesmo modelo",d:"As obrigações contábeis (ECD, ECF, EFD) permanecem. O que muda é a parametrização dos novos tributos no plano de contas. A estrutura de escrituração, os prazos e a lógica de apuração já conhecidos pela equipe contábil continuam válidos.",ok:true},
+            {icone:"🏪",t:"Regime de Caixa e Competência inalterados",d:"As regras de reconhecimento de receita (regime de competência para Lucro Real, regime de caixa para Simples) não mudam com a Reforma. O que muda é quando o tributo é segregado — mas o reconhecimento contábil da receita segue as mesmas normas atuais.",ok:true},
+            {icone:"📋",t:"Contratos em vigor têm proteção transitória",d:"A Reforma prevê que contratos firmados antes da vigência do IBS/CBS não geram inadimplência por cláusulas tributárias antigas durante o período de transição. Porém, recomenda-se incluir cláusula de revisão tributária em novos contratos e renovações.",ok:true},
+            {icone:"🔗",t:"ERP existente é a base — não precisa trocar",d:"O ERP atual é o ponto de partida — não é necessário substituí-lo. O que é necessário é um diagnóstico de parametrização: novos campos de CBS/IBS no XML das NFs, integração com PSP para envio de dados tributários e adaptação das rotinas de conciliação.",ok:true},
+          ].map((g,i)=>h("div",{key:i,style:{background:g.ok?"#E8F5EE":"#fff",borderRadius:8,padding:"11px 14px",
+            border:"1.5px solid "+(g.ok?"#1E7E4A":"#D1DCF0"),
+            borderLeft:"3px solid "+(g.ok?"#1E7E4A":"#3972B4"),
+            display:"flex",flexDirection:"column",gap:4}},
+            h("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:2}},
+              h("span",{style:{fontSize:"1rem"}},g.icone),
+              h("div",{style:{fontSize:".75rem",fontWeight:700,color:"#1A3F6F"}},g.t),
+              h("span",{style:{fontSize:".58rem",fontWeight:700,color:"#1E7E4A",marginLeft:"auto",whiteSpace:"nowrap",background:"#C8EDD6",padding:"2px 7px",borderRadius:3}},"✓ Mantido")
+            ),
+            h("div",{style:{fontSize:".69rem",lineHeight:1.55,color:"#4D4D4F"}},g.d)
+          ))
+        )
+      )
+    ,16),
     // RISCOS
     Sec("⚡ Riscos de Não se Preparar — Impacto Financeiro",
       h("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:9}},
@@ -371,7 +399,57 @@ Impacto prático: o financeiro passa a receber NF − CBS − IBS. Toda projeç�
       )
     ,16),
 
-    // GLOSSÁRIO    // GLOSSÁRIO
+    // GLOSSÁRIO    // ASSISTENTE
+    Sec("🤖 Assistente de Novidades",
+      h("div",{style:C.iaBox},
+        h("div",{style:C.iaHd},
+          h("div",{style:{color:"#fff",fontSize:".82rem",fontWeight:700}},"Consulte atualizações da Reforma Tributária"),
+          h("div",{style:{color:"#D6E4F7",fontSize:".64rem",marginTop:2}},"EC 132/2023 · LC 214/2025 · RFB · CGIBS · Manual Split Payment v1.0")
+        ),
+        h("div",{style:{padding:"13px 15px"}},
+
+
+          // TABS ESTATICAS
+          h("div",{style:{marginBottom:12}},
+            h("div",{style:{...C.tabs,marginBottom:0}},
+              PRELOAD_CHIPS.map(pc=>h("div",{key:pc.key,
+                style:C.tab(activeTab===pc.key),
+                onClick:()=>setActiveTab(pc.key)},
+                pc.label
+              ))
+            ),
+            h("div",{style:{marginTop:10,background:"#EEF3FA",borderLeft:"3px solid #3972B4",borderRadius:"0 8px 8px 0",padding:"12px 14px"}},
+              h("div",{style:{fontSize:".57rem",color:"#3972B4",fontWeight:700,marginBottom:7,letterSpacing:".5px"}},
+                "RESUMO — "+PRELOAD_CHIPS.find(p=>p.key===activeTab)?.label
+              ),
+              ...STATIC_RESPOSTAS[activeTab].split("\n").filter(l=>l.trim()).map((l,i)=>
+                h("p",{key:i,style:{margin:"4px 0",color:"#4D4D4F",fontSize:".72rem",lineHeight:1.65}},l)
+              )
+            )
+          ),
+
+
+        )
+      )
+    ,16),
+    // CHECKLIST
+    Sec("✅ Checklist — Financeiro / Contabilidade",
+      h("div",null,
+        h("div",{style:{...C.sttl,marginBottom:10}},
+          h("span",{style:{color:"#3972B4",fontWeight:700,fontSize:".66rem"}},done+"/"+CK.length+" concluídos")
+        ),
+        h("div",{style:C.gridCk},
+          CK.map((c,i)=>h("div",{key:i,style:C.ckItem(checks[i]),onClick:()=>toggleCk(i)},
+            h("div",{style:C.ckBox(checks[i])},"✓"),
+            h("div",null,
+              h("span",{style:{fontSize:".71rem",fontWeight:700,color:"#1A3F6F",display:"block",marginBottom:1}},c.t),
+              h("span",{style:{fontSize:".65rem",lineHeight:1.4,color:"#4D4D4F"}},c.d)
+            )
+          ))
+        )
+      )
+    ),
+    // GLOSSÁRIO
     Sec("📖 Glossário da Reforma Tributária",
       h("div",null,
         h("div",{style:{fontSize:".68rem",color:"#888",marginBottom:12}},"Termos técnicos explicados para quem está chegando agora na Reforma Tributária."),
@@ -407,6 +485,7 @@ Impacto prático: o financeiro passa a receber NF − CBS − IBS. Toda projeç�
       )
     ,16),
 
+
     // FOOTER
     h("div",{style:{background:"#1A3F6F",color:"#D6E4F7",fontSize:".58rem",textAlign:"center",padding:"12px 18px",marginTop:14}},
       h("div",{style:{marginBottom:6,fontSize:".62rem",fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"#90b8e8"}},"📚 Fontes e Referências"),
@@ -436,85 +515,4 @@ Impacto prático: o financeiro passa a receber NF − CBS − IBS. Toda projeç�
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
 </script>
 </body>
-</html>    // CONVERGÊNCIA
-    Sec("✅ O que Continua Igual — Pontos de Convergência",
-      h("div",null,
-        h("div",{style:{fontSize:".68rem",color:"#888",marginBottom:12}},"O que já existe hoje e funciona a favor da empresa na virada para o novo modelo."),
-        h("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:8}},
-          [
-            {icone:"🏦",t:"Liquidação centralizada na conta da matriz",d:"Sim — o Manual de Integração v1.0 prevê que o domicílio bancário pode ser configurado na matriz, independentemente de qual filial emitiu a NF-e. O grupo registra uma conta única no CGIBS para receber o líquido de todas as filiais da mesma raiz CNPJ. Ação: confirmar o cadastro de domicílio bancário no CGIBS antes de 2027.",ok:true},
-            {icone:"📄",t:"NF-e e NFC-e continuam sendo a base",d:"Os documentos fiscais eletrônicos que a empresa já emite hoje (NF-e, NFC-e) continuam sendo o elo central do sistema. O split payment apenas acrescenta novos campos de vinculação ao XML — o processo de emissão não muda estruturalmente.",ok:true},
-            {icone:"💳",t:"Pix, boleto e cartão continuam sendo os meios",d:"Os meios de pagamento atuais são exatamente os canais do split: Pix, boleto, TEF, TED e cartões. Não há necessidade de adotar novos meios — os PSPs (bancos, gateways) que já processam esses pagamentos serão responsáveis pela segregação automática.",ok:true},
-            {icone:"📊",t:"Não-cumulatividade mantida — crédito garantido",d:"A lógica de crédito tributário nas compras (insumos, mercadorias para revenda) é mantida no IBS e na CBS. O que muda é o mecanismo: o crédito passa a ser financeiro (confirmado após o pagamento), não apenas escritural. Para quem já apura crédito de PIS/Cofins, a lógica base é familiar.",ok:true},
-            {icone:"🔄",t:"Antecipação de recebíveis não muda o momento da retenção",d:"Decreto 12.955/2026 (art. 31, III) confirmou: quando a empresa antecipa recebíveis (banco, securitizadora, FIDC), o split continua ocorrendo no calendário original do cliente final — não na data da antecipação. A operação de antecipação segue como hoje.",ok:true},
-            {icone:"🧾",t:"SPED e escrituração contábil seguem o mesmo modelo",d:"As obrigações contábeis (ECD, ECF, EFD) permanecem. O que muda é a parametrização dos novos tributos no plano de contas. A estrutura de escrituração, os prazos e a lógica de apuração já conhecidos pela equipe contábil continuam válidos.",ok:true},
-            {icone:"🏪",t:"Regime de Caixa e Competência inalterados",d:"As regras de reconhecimento de receita (regime de competência para Lucro Real, regime de caixa para Simples) não mudam com a Reforma. O que muda é quando o tributo é segregado — mas o reconhecimento contábil da receita segue as mesmas normas atuais.",ok:true},
-            {icone:"📋",t:"Contratos em vigor têm proteção transitória",d:"A Reforma prevê que contratos firmados antes da vigência do IBS/CBS não geram inadimplência por cláusulas tributárias antigas durante o período de transição. Porém, recomenda-se incluir cláusula de revisão tributária em novos contratos e renovações.",ok:true},
-            {icone:"🔗",t:"ERP existente é a base — não precisa trocar",d:"O ERP atual é o ponto de partida — não é necessário substituí-lo. O que é necessário é um diagnóstico de parametrização: novos campos de CBS/IBS no XML das NFs, integração com PSP para envio de dados tributários e adaptação das rotinas de conciliação.",ok:true},
-          ].map((g,i)=>h("div",{key:i,style:{background:g.ok?"#E8F5EE":"#fff",borderRadius:8,padding:"11px 14px",
-            border:"1.5px solid "+(g.ok?"#1E7E4A":"#D1DCF0"),
-            borderLeft:"3px solid "+(g.ok?"#1E7E4A":"#3972B4"),
-            display:"flex",flexDirection:"column",gap:4}},
-            h("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:2}},
-              h("span",{style:{fontSize:"1rem"}},g.icone),
-              h("div",{style:{fontSize:".75rem",fontWeight:700,color:"#1A3F6F"}},g.t),
-              h("span",{style:{fontSize:".58rem",fontWeight:700,color:"#1E7E4A",marginLeft:"auto",whiteSpace:"nowrap",background:"#C8EDD6",padding:"2px 7px",borderRadius:3}},"✓ Mantido")
-            ),
-            h("div",{style:{fontSize:".69rem",lineHeight:1.55,color:"#4D4D4F"}},g.d)
-          ))
-        )
-      )
-    ,16),
-    // CHECKLIST
-    Sec("✅ Checklist — Financeiro / Contabilidade",
-      h("div",null,
-        h("div",{style:{...C.sttl,marginBottom:10}},
-          h("span",{style:{color:"#3972B4",fontWeight:700,fontSize:".66rem"}},done+"/"+CK.length+" concluídos")
-        ),
-        h("div",{style:C.gridCk},
-          CK.map((c,i)=>h("div",{key:i,style:C.ckItem(checks[i]),onClick:()=>toggleCk(i)},
-            h("div",{style:C.ckBox(checks[i])},"✓"),
-            h("div",null,
-              h("span",{style:{fontSize:".71rem",fontWeight:700,color:"#1A3F6F",display:"block",marginBottom:1}},c.t),
-              h("span",{style:{fontSize:".65rem",lineHeight:1.4,color:"#4D4D4F"}},c.d)
-            )
-          ))
-        )
-      )
-    ),
-    // ASSISTENTE
-    Sec("🤖 Assistente de Novidades",
-      h("div",{style:C.iaBox},
-        h("div",{style:C.iaHd},
-          h("div",{style:{color:"#fff",fontSize:".82rem",fontWeight:700}},"Consulte atualizações da Reforma Tributária"),
-          h("div",{style:{color:"#D6E4F7",fontSize:".64rem",marginTop:2}},"EC 132/2023 · LC 214/2025 · RFB · CGIBS · Manual Split Payment v1.0")
-        ),
-        h("div",{style:{padding:"13px 15px"}},
-
-
-          // TABS ESTATICAS
-          h("div",{style:{marginBottom:12}},
-            h("div",{style:{...C.tabs,marginBottom:0}},
-              PRELOAD_CHIPS.map(pc=>h("div",{key:pc.key,
-                style:C.tab(activeTab===pc.key),
-                onClick:()=>setActiveTab(pc.key)},
-                pc.label
-              ))
-            ),
-            h("div",{style:{marginTop:10,background:"#EEF3FA",borderLeft:"3px solid #3972B4",borderRadius:"0 8px 8px 0",padding:"12px 14px"}},
-              h("div",{style:{fontSize:".57rem",color:"#3972B4",fontWeight:700,marginBottom:7,letterSpacing:".5px"}},
-                "RESUMO — "+PRELOAD_CHIPS.find(p=>p.key===activeTab)?.label
-              ),
-              ...STATIC_RESPOSTAS[activeTab].split("\n").filter(l=>l.trim()).map((l,i)=>
-                h("p",{key:i,style:{margin:"4px 0",color:"#4D4D4F",fontSize:".72rem",lineHeight:1.65}},l)
-              )
-            )
-          ),
-
-
-        )
-      )
-    ,16),
-
-
-
+</html>
