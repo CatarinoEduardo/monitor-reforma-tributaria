@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Monitor Reforma Tributária · Grupo Veste</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#F4F6F9;font-family:'Segoe UI',Arial,sans-serif;color:#4D4D4F}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const h=React.createElement;
+const {useState}=React;
+
+const SP=`Você é especialista em Reforma Tributária brasileira (EC 132/2023, LC 214/2025), foco em impactos financeiros e contábeis para varejo. Domínio sobre IBS, CBS, IS, Split Payment, transição 2026-2033. Cronograma: 2026 testes split ~1%; 2027 CBS plena+extinção PIS/Cofins; 2028 IBS obrigatório B2B+-20%ICMS/ISS; 2029-32 redução gradual; 2033 extinção total ICMS/ISS. Contexto: Grupo Veste, varejo de moda, multimarca, filiais mesma raiz CNPJ. Responda objetivamente, bullets simples, máx 5 parágrafos curtos, sem markdown complexo.`;
+
+const CHIPS=[
+  {l:"📰 Novidades 2026",q:"Quais as principais novidades e publicações da Reforma Tributária em 2026?"},
+  {l:"📅 Próximos prazos",q:"Quais os próximos prazos críticos da Reforma Tributária para o financeiro?"},
+  {l:"⚠️ Pontos de atenção",q:"Quais os principais pontos de atenção financeiro e contábil da Reforma para varejo?"},
+  {l:"💰 Capital de giro",q:"Como a Reforma Tributária impacta o capital de giro e fluxo de caixa do varejo de moda?"},
+  {l:"📊 ICMS → IBS",q:"Como funciona a transição do ICMS para IBS e qual o impacto na contabilidade?"},
+  {l:"🔄 Split Payment",q:"Como o Split Payment se encaixa na Reforma e qual o cronograma de obrigatoriedade?"},
+  {l:"📝 Obrigações acessórias",q:"Quais obrigações acessórias mudam com a Reforma? O que o financeiro precisa adaptar?"},
+  {l:"🏪 Varejo/moda",q:"Quais os impactos específicos da Reforma para varejo de moda com multimarcas?"},
+];
+
+const TL=[
+  {ano:"2026",status:"Em curso",tipo:"ativo",desc:"Testes Split Payment alíquota simbólica (~1%). IBS+CBS em teste (0,1%+0,9%). Manual de Integração v1.0 publicado 03/06/2026. Sem cobrança efetiva — validação tecnológica e cadastral.",tags:["Manual Split Payment publicado (03/06/2026)","NF-e: campos IBS/CBS obrigatórios ago/2026","Sem recolhimento efetivo — ano informativo"]},
+  {ano:"2027",status:"Próximo",tipo:"proximo",desc:"CBS plena em vigor. Extinção do PIS/Cofins. Split Payment facultativo no B2B com crédito garantido. IBS em alíquota reduzida. ERP deve estar adaptado.",tags:["Extinção PIS/Cofins","CBS plena obrigatória","Split B2B facultativo"]},
+  {ano:"2028",status:"A definir",tipo:"futuro",desc:"IBS obrigatório B2B. Início redução ICMS/ISS em 20% ao ano. Split obrigatório em novos meios. Regimes específicos definidos por lei complementar.",tags:["IBS obrigatório B2B","-20% ICMS/ISS (1ª parcela)","Novos regimes específicos"]},
+  {ano:"2029–32",status:"Transição",tipo:"futuro",desc:"Redução contínua ICMS/ISS (-20%/ano). Apuração dual — período crítico. Créditos acumulados de ICMS em risco de perda.",tags:["-40% a -80% ICMS/ISS","Créditos acumulados ICMS","Benefícios fiscais extinção"]},
+  {ano:"2033",status:"Definitivo",tipo:"futuro",desc:"Extinção total ICMS e ISS. IBS/CBS em alíquotas plenas. Split obrigatório em todos os meios eletrônicos. Reforma concluída.",tags:["ICMS/ISS extintos","IBS/CBS plenos","Split obrigatório universal"]},
+];
+
+const ALERTAS=[
+  {u:"critico",t:"Manual Split Payment v1.0",d:"Publicado 03/06/2026 pela RFB/SERPRO/CGIBS/PROCERGS. Define 6 campos de liquidação, integração PSP e 3 modos operacionais. TI/ERP deve avaliar imediatamente.",p:"Jun/2026"},
+  {u:"critico",t:"Cadastro IBS — Ato Conjunto nº 02/2026",d:"Confirmar cadastro junto ao CGIBS. Filiais com mesma raiz CNPJ precisam de atenção especial no domicílio bancário para liquidação centralizada.",p:"2026"},
+  {u:"alto",t:"Extinção PIS/Cofins em 2027",d:"Menos de 12 meses. ERP deve ser parametrizado para CBS. Regras de crédito, base de cálculo e exceções mudam. Revisão de fornecedores e contratos necessária.",p:"Jan/2027"},
+  {u:"alto",t:"Regulamentação IS (Imposto Seletivo)",d:"Pendente para vários setores. Empresas com insumos sujeitos ao IS (embalagens, energia, veículos) devem monitorar portarias setoriais.",p:"A definir"},
+  {u:"medio",t:"Benefícios Fiscais Estaduais ICMS",d:"A partir de 2028 o ICMS começa a ser reduzido. Benefícios atrelados ao ICMS perdem base. Financeiro deve mapear e negociar alternativas antes de 2027.",p:"Até 2027"},
+  {u:"medio",t:"Regimes Específicos (Combustíveis, Financeiro, Imóveis)",d:"LC 214/2025 prevê regimes diferenciados ainda em elaboração. Não projetar com base no regime geral para esses segmentos.",p:"2026–2027"},
+  {u:"critico",t:"Cadastro de produtos/NCM — risco silencioso em 2026",d:"Erros de NCM, descrição genérica ou vínculo incorreto entre item e tributação contaminam simultaneamente IBS e CBS. Um erro que antes afetava um tributo agora se replica em cadeia. Com 2026 sendo o ano de calibragem do sistema, quem não ajustar o cadastro agora chega a 2027 com base tributária incorreta. Fonte: e-Auditoria, mai/2026.",p:"Até ago/2026"},
+  {u:"alto",t:"Precificação precisa ser revisada em 2026 — não em 2027",d:"Mesmo sem recolhimento efetivo, IBS e CBS já afetam base de cálculo, créditos e margens. Contratos, tabelas de preço e política comercial baseados no sistema atual podem gerar perda de margem ao virar 2027. 2026 é a janela para simular e calibrar. Fonte: RDD10+/Roberto Dias Duarte, mai/2026.",p:"2º sem/2026"},
+  {u:"critico",t:"FCBF — Habilitação para compensar perda de incentivos ICMS",d:"Fundo de Compensação de Benefícios Fiscais (FCBF): empresas com incentivos de ICMS concedidos até 31/mai/2023 podem requerer habilitação para compensação financeira durante a transição (2029–2032). Janela de habilitação: jan/2026 a dez/2028 via e-CAC. Quem não se habilitar perde o direito à compensação. RFB detalhou o fundo em módulo com CFC em 10/jun/2026. Fonte: Portaria RFB nº 635/2025 / EC 132/2023, art. 12.",p:"Até 31/12/2028"},
+  {u:"critico",t:"Simples Nacional: prazo para opção entre Simples Puro e Simples Híbrido",d:"Empresas do Simples Nacional devem escolher entre Simples Puro (regime atual) ou Simples Híbrido (recolhe CBS e IBS separadamente para aproveitar créditos). Janela de opção: 1º a 30/set/2026 — vale a partir de jan/2027. Prazo de desistência (ponto de não retorno): 30/nov/2026. Decisão impacta cadeia de fornecedores: Simples Puro transfere menos crédito. Fonte: Decreto 12.955/2026 / CRCMA, mai/2026.",p:"Set/2026"},
+  {u:"alto",t:"Apuração CBS/IBS: mensal — pagamento até último dia do mês seguinte",d:"Regulamentos da CBS e IBS confirmaram: apuração mensal, pagamento até o último dia útil do mês subsequente — até a implementação do split payment. A partir do split, o recolhimento passa a ser automático na liquidação financeira. Financeiro deve adequar o calendário de obrigações já em 2026 para não ser pego de surpresa em jan/2027. Fonte: Decreto 12.955/2026 / Athros Auditoria, mai/2026.",p:"Jan/2027"},
+  {u:"alto",t:"Créditos apurados em 2026 não são ressarcíveis em 2027",d:"Art. 465 do Decreto 12.955/2026: saldo a recuperar em 31/12/2026 decorrente da apuração de 2026 será desconsiderado a partir de jan/2027 e não será objeto de ressarcimento. Empresas que apurarem créditos de CBS/IBS em 2026 não poderão recuperá-los. Fonte: Souto Correa, mai/2026.",p:"31/12/2026"},
+  {u:"critico",t:"LC 224/2025: corte de 90% nos incentivos fiscais federais já em 2026",d:"Benefícios federais como isenção e alíquota zero passam a ser cobrados em 10% da alíquota padrão. Créditos e reduções ficam limitados a 90% do valor hoje permitido. Vigência escalonada: jan/2026 para IRPJ e II, abr/2026 para PIS/Cofins/IPI. Diferente do FCBF (que trata de ICMS estadual) — este é federal e já está em vigor. Impacta diretamente margem de fornecedores da cadeia de moda. Fonte: LC 224/2025 / ABVTEX-ROIT, mar/2026.",p:"Jan/Abr 2026 — já em vigor"},
+  {u:"alto",t:"ICMS-ST e incentivos regionais em extinção — impacto no custo de estoque",d:"Substituição Tributária (ICMS-ST) e incentivos estaduais que reduzem custo em operações interestaduais serão extintos gradualmente até 2033 (EC 132/2023). Levantamento do IBPT estima impacto médio de até 5,8% no custo de estoque de varejistas de moda nos primeiros anos da transição. Em estados como SP, MG e RS, aumento pode chegar a 6% no preço de revenda quando o fornecedor é de outro estado. Fonte: IBPT/Contábeis, mar/2026.",p:"2026–2033 (gradual)"},
+  {u:"critico",t:"E-commerce: gap técnico Split — captura Matriz × fatura Filial",d:"Com o Split Payment, o PSP precisa vincular o ID da transação (capturado pelo CNPJ da Matriz) à NF-e emitida pela Filial. Esse fluxo reverso não existe nos sistemas atuais. Cenário crítico: um pagamento gera duas NF-es (CD + Filial) — vinculação 1:N depende de regulamentação ainda não publicada (NT 2026.001). Ação: mapear com gateway, ERP e integradores os 3 cenários de faturamento antes de 2027. Fonte: NT 2026.001 ENCAT / Manual Split v1.0.",p:"2026 — mapear já"},
+  {u:"critico",t:"NF-e/NFC-e: campos IBS/CBS obrigatórios a partir de ago/2026",d:"NT 2025.002-RTC v1.36: a partir de 03/08/2026, preenchimento de IBS e CBS é obrigatório em produção para Lucro Real e Lucro Presumido (CRT=3). Sistemas emissores e ERPs devem estar adaptados. Simples Nacional: prazo até jan/2027. Fonte: NT 2025.002 / Portal DFe.",p:"03/08/2026"},
+  {u:"critico",t:"Split Payment: início efetivo NÃO é jan/2027",d:"Decreto 12.955/2026 e especialistas confirmaram: o split não começa em janeiro de 2027. O cronograma exato por arranjo de pagamento (Pix, boleto, cartão) ainda será definido por ato conjunto RFB/CGIBS. Empresas não devem planejar como se jan/2027 fosse a data de virada. Fonte: CRCMA/Diário do Comércio, mai/2026.",p:"A confirmar"},
+
+  {u:"alto",t:"2026 é ano informativo — sem desembolso de IBS/CBS",d:"Art. 348 da LC 214/2025 e Comunicado Conjunto CGIBS/RFB nº 01/2025 confirmam: em 2026, IBS e CBS devem ser calculados e destacados na NF-e, mas não há recolhimento efetivo. O valor pago no teste (~1%) é compensado com PIS/Cofins. Carga tributária total permanece inalterada. Fonte: TOTVS/Comunicado CGIBS/RFB.",p:"Todo 2026"},
+];
+
+const IMPACTOS=[
+  {n:"alto",area:"cr",prev:"Imediato — Split em teste 2026",t:"Extinção do Float Tributário (Split Payment)",d:"Tributo não passa mais pelo caixa. Perda média ~40 dias de capital de giro. Mais crítico para varejo com parcelamento."},
+  {n:"alto",area:"cr",prev:"Imediato — CBS plena jan/2027",t:"Valor Líquido Recebido Reduzido",d:"Recebimento passa a ser NF − CBS − IBS. Projeções de fluxo de caixa precisam ser refeitas integralmente."},
+  {n:"alto",area:"cp",prev:"Imediato — Split B2B 2027–2028",t:"Crédito de IBS/CBS só com NF válida vinculada",d:"O direito ao crédito nas compras depende da vinculação NF-e ↔ pagamento. NF com erro ou CNPJ irregular cancela o crédito automaticamente."},
+  {n:"alto",area:"cp",prev:"Imediato — cadastro CGIBS 2026",t:"Validação de Fornecedor vira pré-requisito financeiro",d:"CNPJ ativo, regime tributário correto e adesão ao split são condições para aproveitamento do crédito IBS/CBS. AP precisa validar antes de cada pagamento."},
+  {n:"alto",area:"cr",prev:"Imediato — jan/2027",t:"Extinção do PIS/Cofins em 2027",d:"Migração para CBS muda alíquota, base e créditos. ERP, notas e contratos precisam ser revisados antes de jan/2027."},
+  {n:"alto",area:"cp",prev:"Faseado — facultativo 2027, obrigatório 2028",t:"Split no B2B: fornecedor recebe líquido de IBS/CBS",d:"A partir de 2027 (facultativo) e 2028 (obrigatório), o pagamento já desconta IBS/CBS na origem. Impacto em renegociação de contratos e prazos com fornecedores."},
+  {n:"alto",area:"cp",prev:"Imediato — jan/2027",t:"Fim do PIS/Cofins a recuperar nas compras",d:"Com a extinção do PIS/Cofins em 2027, créditos de entrada deixam de existir nesse formato. A CBS substitui com alíquota, base e regras diferentes — revisão total das planilhas de crédito de entrada."},
+  {n:"alto",area:"cr",prev:"Faseado — crítico 2028–2032",t:"Gestão de Créditos Acumulados de ICMS",d:"Na transição 2028–2032, créditos de ICMS tornam-se inutilizáveis. Necessário mapeamento e uso estratégico antes da extinção."},
+  {n:"medio",area:"cr",prev:"Faseado — 2028 a 2032",t:"Apuração Dual ICMS + IBS (2028–2032)",d:"Por 5 anos, dois tributos sobre consumo simultaneamente. Maior custo de compliance. Sistemas devem suportar ambos os regimes."},
+  {n:"medio",area:"cr",prev:"Faseado — Split obrigatório 2028",t:"Conciliação por Transação (6 campos)",d:"vlPago, vlCbsSegr, vlIbsSegr, vlCbsCorr, vlIbsCorr, vlAberto. Rotinas de conciliação bancária precisam ser redesenhadas."},
+  {n:"medio",area:"cp",prev:"Imediato — revisar antes de 2027",t:"Contratos com fornecedores precisam ser revisados",d:"Condições de preço e prazo negociadas antes da reforma podem não refletir o novo custo tributário. Recomendado incluir cláusula de revisão tributária nos contratos."},
+  {n:"medio",area:"cp",prev:"Faseado — impacto crescente 2027–2028",t:"Antecipação de pagamentos perde vantagem fiscal",d:"Antecipar pagamento significa antecipar a saída do IBS/CBS do caixa do fornecedor via split. Estratégias de desconto financeiro devem ser reavaliadas."},
+  {n:"medio",area:"cr",prev:"Faseado — redução 20%/ano a partir de 2028",t:"Perda de Benefícios Fiscais Estaduais",d:"Incentivos de ICMS extintos progressivamente. Impacto relevante em SP, MG, SC e outros estados com benefícios ativos."},
+  {n:"medio",area:"cp",prev:"Faseado — Split Super Inteligente 2027+",t:"Crédito IBS/CBS do Fornecedor afeta o valor retido",d:"No Split Super Inteligente, o sistema desconta os créditos acumulados do fornecedor antes de segregar o tributo. Fornecedor com crédito elevado recebe mais líquido — impacta negociação de preço, prazo e a conciliação do AP."},
+  {n:"medio",area:"cp",prev:"Faseado — 2028 a 2032",t:"Conciliação AP mais complexa no período dual",d:"Entre 2028 e 2032, cada NF de compra carrega ICMS e IBS simultaneamente. O sistema de AP precisa apurar créditos nos dois regimes por transação."},
+  {n:"baixo",area:"cr",prev:"Faseado — pleno a partir de 2028",t:"Simplificação de Obrigações Acessórias",d:"Eliminação de DARF, DAS e GARE para IBS/CBS. Menos obrigações mensais e redução de contingências fiscais."},
+  {n:"baixo",area:"cp",prev:"Faseado — pleno a partir de 2028",t:"Eliminação de guias de recolhimento nas compras",d:"Com o split, não há mais DARF/GARE para PIS/Cofins/ICMS-ST sobre compras. Recolhimento automático no pagamento — exige rastreabilidade por NF."},
+  {n:"alto",area:"cr",prev:"Faseado — obrigatório a partir de 2027+",t:"E-commerce: vinculação NF-e ↔ pagamento obrigatória no Split (NT 2026.001)",d:"O Split Payment exige que cada pagamento seja vinculado ao DFe (NF-e) correspondente para segregar IBS/CBS. No e-commerce com captura pela Matriz e faturamento pela Filial, o gateway precisará receber a chave da NF-e emitida após a captura — fluxo reverso não existe hoje. Cenário mais crítico: um pagamento → duas NF-es (CD + Filial), que exige vinculação 1:N ainda pendente de regulamentação. Fonte: NT 2026.001 RTC / ENCAT, mar/2026."},
+  {n:"alto",area:"cr",prev:"Imediato — gap técnico a mapear em 2026",t:"E-commerce Matriz/Filial: tpIntegra=2 e intercompany formal são insuficientes no Split",d:"Hoje: tpIntegra=2 (não integrado) resolve a dissociação Matriz/Filial. Com Split: além do tpIntegra, o PSP precisa vincular o ID da transação (captura Matriz) à NF-e emitida pela Filial. Sem esse protocolo, o split não segrega o IBS/CBS corretamente e o crédito do comprador pode ser cancelado. Ação: mapear com gateway e ERP como o ID de transação será transmitido ao emissor antes ou no momento da liquidação."},
+];
+
+const CK=[
+  {t:"Diagnóstico de ERP",d:"Mapear lacunas do ERP para suportar IBS, CBS e campos de split payment"},
+  {t:"Simulação de Fluxo de Caixa",d:"Refazer projeções 2027–2033 com recebimento líquido (NF − CBS − IBS)"},
+  {t:"Revisão de Capital de Giro",d:"Calcular perda de float e negociar linha de crédito preventiva com banco"},
+  {t:"Mapeamento PIS/Cofins → CBS",d:"Identificar impacto da migração: alíquota, base, créditos e exceções"},
+  {t:"Créditos ICMS Acumulados",d:"Inventariar créditos existentes e planejar utilização antes de 2028"},
+  {t:"Benefícios Fiscais Estaduais",d:"Mapear incentivos ICMS que serão extintos e negociar alternativas"},
+  {t:"Conciliação Bancária",d:"Adaptar rotina para processar os 6 campos CBS/IBS por transação"},
+  {t:"Integração ERP ↔ PSP",d:"Garantir envio de dados tributários em tempo real ao banco/gateway"},
+  {t:"Cadastro CGIBS",d:"Confirmar cadastro IBS e configurar domicílio bancário por CNPJ/filial"},
+  {t:"Contabilidade Intercompany",d:"Estruturar lançamentos de mútuo/rateio entre matriz e filiais no split"},
+  {t:"Cadastro de Fornecedores",d:"Validar regime tributário e CNPJ ativo — pré-requisito de crédito IBS/CBS"},
+  {t:"Habilitação FCBF (benefícios ICMS)",d:"Se a empresa possui incentivos de ICMS concedidos até mai/2023, requerer habilitação ao FCBF via e-CAC antes de dez/2028 para garantir compensação na transição"},
+  {t:"Opção Simples Híbrido (se aplicável)",d:"Avaliar se fornecedores Simples devem migrar para Simples Híbrido — impacta crédito IBS/CBS na cadeia. Prazo de opção: set/2026"},
+  {t:"E-commerce: mapear vinculação NF-e ↔ pagamento (Split)",d:"Mapear com gateway e ERP como ID de transação (Matriz) será vinculado à NF-e (Filial/CD) nos 3 cenários de faturamento antes de 2027"},
+  {t:"Acompanhar Piloto 2026",d:"Monitorar publicações RFB/CGIBS e testar integração Plataforma Pública"},
+];
+
+// ── helpers ──────────────────────────────────────────────
+const tlColors={ativo:{border:"#3972B4",bg:"#EEF3FA"},proximo:{border:"#F0A500",bg:"#FFF8EC"},futuro:{border:"#D1DCF0",bg:"#fff"}};
+const tlAnoColor={ativo:"#1A3F6F",proximo:"#F0A500",futuro:"#aaa"};
+const tlBadgeStyle={ativo:{background:"#3972B4",color:"#fff"},proximo:{background:"#F0A500",color:"#fff"},futuro:{background:"#ddd",color:"#999"}};
+const tlTagStyle={ativo:{background:"#D6E4F7",color:"#1A3F6F"},proximo:{background:"#FEE9B0",color:"#7a5200"},futuro:{background:"#F0F0F0",color:"#888"}};
+const urgColor={critico:"#D32F2F",alto:"#F0A500",medio:"#3972B4"};
+const nivelColor={alto:"#D32F2F",medio:"#F0A500",baixo:"#1E7E4A"};
+const urgLabel=u=>u==="critico"?"● Ação Imediata":u==="alto"?"● Alta Prioridade":"● Monitorar";
+const nivelLabel=n=>n==="alto"?"● Alto impacto":n==="medio"?"● Médio impacto":"✓ Benefício";
+
+// ── App ───────────────────────────────────────────────────
+function App(){
+  const [checks,setChecks]=useState(Array(CK.length).fill(false));
+  const [query,setQuery]=useState("");
+  const [apiKey,setApiKey]=useState(()=>{ try{return localStorage.getItem("veste_api_key")||"";}catch{return "";} });
+  const [showKey,setShowKey]=useState(false);
+  const [loading,setLoading]=useState(false);
+  const [resposta,setResposta]=useState("");
+  const [erro,setErro]=useState("");
+  const [tabAlerta,setTabAlerta]=useState("todos");
+  const [tabImpacto,setTabImpacto]=useState("todos");
+
+
+  const toggleCk=i=>{const n=[...checks];n[i]=!n[i];setChecks(n);};
+  const done=checks.filter(Boolean).length;
+  const saveKey=k=>{setApiKey(k);try{localStorage.setItem("veste_api_key",k);}catch{}};
+
+
+  const PRELOAD_CHIPS=[
+    {key:"prazos",  label:"📅 Próximos prazos"},
+    {key:"atencao", label:"⚠️ Pontos de atenção"},
+    {key:"split",   label:"🔄 Split Payment"},
+    {key:"varejo",  label:"🏪 Varejo/moda"},
+  ];
+  const [activeTab,setActiveTab]=useState("prazos");
+
+  const STATIC_RESPOSTAS={
+    prazos:`Prazos críticos para o financeiro se preparar:
+
+▸ 03/06/2026 — Manual de Integração Split Payment v1.0 publicado. Ato Conjunto RFB/CGIBS nº 02/2026. TI/ERP deve avaliar imediatamente os 6 campos de liquidação e os 3 modos operacionais.
+▸ 2026 — Confirmar cadastro CGIBS (Ato Conjunto RFB/CGIBS nº 02/2026). Filiais mesma raiz CNPJ precisam de atenção no domicílio bancário.
+▸ 03/08/2026 — Campos IBS/CBS obrigatórios na NF-e/NFC-e para Lucro Real e Lucro Presumido (NT 2025.002 v1.36). ERPs devem estar adaptados.
+▸ Jan/2027 — Extinção do PIS/Cofins. CBS entra em vigor plena. Revisão de contratos e fornecedores necessária antes dessa data.
+▸ Atenção: split payment efetivo NÃO começa necessariamente em jan/2027 — cronograma por arranjo de pagamento será definido por ato conjunto RFB/CGIBS.
+▸ 2º semestre 2027 — Split Payment efetivo no B2B (início facultativo). Empresas com vendas a prazo devem ter projeções de fluxo de caixa refeitas.
+▸ 2028 — IBS obrigatório no B2B. Início da redução do ICMS/ISS em 20% ao ano. Split obrigatório em novos meios de pagamento.
+▸ 2028–2032 — Período de apuração dual (ICMS + IBS). Maior complexidade de compliance. Créditos acumulados de ICMS em risco de perda.
+▸ 2033 — Extinção total do ICMS e ISS. IBS/CBS plenos. Split obrigatório em todos os meios eletrônicos.
+
+Ação imediata recomendada: iniciar diagnóstico do ERP e simulação de fluxo de caixa 2027–2033 com recebimento líquido (NF − CBS − IBS).`,
+
+    atencao:`Principais pontos de atenção para o financeiro e contabilidade do varejo:
+
+▸ Float tributário em extinção — O tributo não passará mais pelo caixa a partir do split efetivo (2027). Perda estimada de ~40 dias de capital de giro. Para varejo com cartão parcelado, o impacto é ainda maior.
+▸ DRE e indicadores históricos — A comparação entre DRE de 2026 e 2028 pode mostrar variações que não refletem queda real de performance, mas mudança na forma de reconhecimento dos tributos. Atenção ao comparativo histórico.
+▸ Fornecedores do Simples Nacional — Empresas fornecedoras no Simples transferem menos crédito de CBS/IBS, o que pode reduzir competitividade e exige reavaliação da base de fornecedores.
+▸ Precificação precisa ser revisada ao menos 6 vezes até 2033 — Alíquotas de CBS e IBS variam a cada etapa da transição. Contratos de longo prazo devem incluir cláusula de repactuação tributária.
+▸ Créditos de IBS/CBS vinculados à NF — O crédito só é válido com NF-e vinculada ao pagamento e CNPJ do fornecedor ativo. Erros na emissão cancelam o crédito automaticamente.
+▸ Benefícios fiscais estaduais de ICMS em extinção — Incentivos atrelados ao ICMS perdem base a partir de 2028. Mapeamento e negociação com estados deve ocorrer antes de 2027.
+▸ Regulamentação IS (Imposto Seletivo) — Ainda pendente para vários setores. Empresas com insumos sujeitos (embalagens, energia, veículos) devem monitorar portarias setoriais.`,
+
+    split:`O Split Payment na Reforma Tributária — cronograma e funcionamento:
+
+O que é: mecanismo que segrega automaticamente CBS e IBS no momento da liquidação financeira. O PSP (banco, gateway) retém o tributo e repassa apenas o valor líquido ao vendedor.
+
+Modalidades previstas:
+▸ Split Inteligente Online — NF vinculada em tempo real à transação. PSP separa os campos vlCbsSegr e vlIbsSegr na liquidação.
+▸ Split Inteligente Offline — Vinculação posterior com conciliação. Para meios sem integração em tempo real.
+▸ Split Simplificado — Percentual fixo retido, sem vinculação por NF. Usado em casos de fallback.
+
+Cronograma:
+▸ 2026 — Fase de testes. Alíquota simbólica (~1%). Manual de Integração v1.0 publicado em 03/06/2026. Sem recolhimento efetivo.
+▸ 2º sem/2027 — Split efetivo no B2B, início facultativo. Prioridade: Pix e boleto. Cartão de crédito em etapas posteriores.
+▸ 2028 — Obrigatoriedade no B2B por Atos Conjuntos RFB/CGIBS.
+▸ 2033 — Split obrigatório em todos os meios eletrônicos.
+
+6 campos de liquidação (Manual v1.0): vlPago, vlCbsSegr, vlIbsSegr, vlCbsCorr, vlIbsCorr, vlAberto.
+
+Impacto prático: o financeiro passa a receber NF − CBS − IBS. Toda projeção de fluxo de caixa precisa ser refeita com base no recebimento líquido.`,
+
+    varejo:`Impactos específicos da Reforma Tributária para varejo de moda multimarca:
+
+▸ Capital de giro — O varejo de moda com cartão parcelado é um dos setores mais afetados pelo split. O tributo que ficava no caixa entre a venda e o vencimento da guia deixa de existir. Empresas devem negociar linhas de crédito preventivas antes de 2027.
+▸ Sazonalidade — Varejistas que usam o caixa do período forte (Natal, Dia das Mães) para bancar o período fraco perderão esse colchão. O planejamento de caixa sazonal precisa ser completamente revisto.
+▸ Fornecedores no Simples Nacional — Fornecedores de moda no Simples transferem menos crédito de CBS/IBS. A cadeia de fornecimento precisa ser mapeada e, em alguns casos, renegociada.
+▸ Filiais mesma raiz CNPJ — Grupo Veste: a liquidação centralizada via domicílio bancário unificado é essencial. O cadastro CGIBS precisa refletir corretamente cada filial para evitar retenção incorreta.
+▸ Estoque e precificação — Com alíquotas mudando a cada etapa até 2033, política de preços e margens precisa ser revisada regularmente. Contratos de fornecimento devem incluir cláusula de revisão tributária.
+▸ Créditos de IBS/CBS nas compras de coleção — O crédito sobre compras de mercadoria para revenda é garantido, mas depende de NF válida e CNPJ ativo do fornecedor. Qualificação cadastral da base de fornecedores é urgente.
+▸ E-commerce — Margens já apertadas ficam mais pressionadas com o split. O valor líquido recebido por pedido cai. Revisar política de frete, parcelamento sem juros e campanhas de desconto.`,
+  };
+
+
+  const consultar=async()=>{
+
+    if(!query.trim()||loading)return;
+    if(!apiKey.trim()){setErro("Insira sua API key Anthropic para usar o assistente.");setShowKey(true);return;}
+    setLoading(true);setResposta("");setErro("");
+    try{
+      const res=await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01"},
+        body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:SP,messages:[{role:"user",content:query}]}),
+      });
+      const data=await res.json();
+      if(data.error)setErro("Erro da API: "+data.error.message);
+      else setResposta(data?.content?.[0]?.text||"Sem resposta.");
+    }catch{setErro("Erro de conexão. Verifique sua API key e conexão com a internet.");}
+    finally{setLoading(false);}
+  };
+
+  const af=tabAlerta==="todos"?ALERTAS:ALERTAS.filter(a=>a.u===tabAlerta);
+  const impF=tabImpacto==="todos"?IMPACTOS:IMPACTOS.filter(i=>i.area===tabImpacto);
+  const today=new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"short",year:"numeric"});
+
+  // ── styles ─────────────────────────────────────────────
+  const C={
+    page:{fontFamily:"'Segoe UI',Arial,sans-serif",background:"#F4F6F9",minHeight:"100vh"},
+    hdr:{background:"#1A3F6F",padding:"14px 22px",display:"flex",alignItems:"center",justifyContent:"space-between"},
+    h1:{color:"#fff",fontSize:"1.08rem",fontWeight:800,margin:0},
+    hsub:{color:"#D6E4F7",fontSize:".68rem",marginTop:2},
+    badge:{background:"#3972B4",color:"#fff",fontSize:".6rem",fontWeight:700,letterSpacing:"1.5px",padding:"3px 9px",borderRadius:4},
+    hdate:{color:"#D6E4F7",fontSize:".6rem",marginTop:3,textAlign:"right"},
+    sec:{padding:"15px 20px 0"},
+    sttl:{fontSize:".58rem",fontWeight:700,letterSpacing:"1.4px",textTransform:"uppercase",color:"#2E588C",marginBottom:10,display:"flex",alignItems:"center",gap:8},
+    ln:{flex:1,height:1,background:"#D1DCF0"},
+    tlWrap:{display:"flex",paddingBottom:6,gap:0},
+    tlItem:{flex:"1 1 0",minWidth:0,position:"relative"},
+    tlArrow:{position:"absolute",right:-7,top:15,color:"#3972B4",fontSize:".82rem",zIndex:2},
+    tabs:{display:"flex",flexWrap:"wrap",gap:5,marginBottom:10},
+    tab:a=>({fontSize:".62rem",fontWeight:700,padding:"4px 10px",borderRadius:20,cursor:"pointer",border:"1.5px solid",userSelect:"none",
+      ...(a?{background:"#3972B4",color:"#fff",borderColor:"#3972B4"}:{background:"#fff",color:"#2E588C",borderColor:"#D1DCF0"})}),
+    aGrid:{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:8},
+    grid2:{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,alignItems:"stretch"},
+    gridCk:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(182px,1fr))",gap:7},
+    card:{background:"#fff",borderRadius:9,padding:"11px 13px",border:"1.5px solid #D1DCF0"},
+    prevBadge:{fontSize:".56rem",color:"#2E588C",fontWeight:600,marginBottom:4,background:"#F0F4FA",display:"inline-block",padding:"2px 7px",borderRadius:3},
+    ctitulo:{fontSize:".78rem",fontWeight:700,color:"#1A3F6F",marginBottom:3},
+    cdesc:{fontSize:".68rem",lineHeight:1.5,color:"#4D4D4F"},
+    prazo:{fontSize:".59rem",fontWeight:700,color:"#2E588C",background:"#EEF3FA",display:"inline-block",padding:"2px 7px",borderRadius:3,marginTop:5},
+    ckItem:d=>({background:d?"#E8F5EE":"#fff",border:"1.5px solid "+(d?"#1E7E4A":"#D1DCF0"),borderRadius:7,padding:"8px 10px",display:"flex",gap:8,alignItems:"flex-start",cursor:"pointer"}),
+    ckBox:d=>({width:15,height:15,borderRadius:3,flexShrink:0,marginTop:1,display:"flex",alignItems:"center",justifyContent:"center",fontSize:".56rem",fontWeight:700,border:"2px solid "+(d?"#1E7E4A":"#D1DCF0"),background:d?"#1E7E4A":"#fff",color:d?"#fff":"transparent"}),
+    iaBox:{background:"#fff",border:"1.5px solid #D1DCF0",borderRadius:11,overflow:"hidden",marginBottom:18},
+    iaHd:{background:"#1A3F6F",padding:"11px 15px"},
+    keyBox:{background:"#FFF8EC",border:"1.5px solid #F0A500",borderRadius:9,padding:"11px 14px",marginBottom:12,display:"flex",flexDirection:"column",gap:7},
+    keyInfo:{fontSize:".64rem",color:"#7a5200",lineHeight:1.5},
+    chip:{border:"1.5px solid #3972B4",color:"#3972B4",background:"#EEF3FA",fontSize:".63rem",fontWeight:600,padding:"4px 9px",borderRadius:20,cursor:"pointer",whiteSpace:"nowrap",display:"inline-block"},
+    inp:{flex:1,border:"1.5px solid #D1DCF0",borderRadius:7,padding:"7px 11px",fontSize:".74rem",outline:"none",fontFamily:"'Segoe UI',Arial,sans-serif"},
+    btn:d=>({background:d?"#aaa":"#3972B4",color:"#fff",border:"none",borderRadius:7,padding:"7px 14px",fontSize:".74rem",fontWeight:700,cursor:d?"not-allowed":"pointer",whiteSpace:"nowrap"}),
+    respBox:{marginTop:10,background:"#EEF3FA",borderLeft:"3px solid #3972B4",borderRadius:"0 7px 7px 0",padding:"10px 13px",fontSize:".72rem",lineHeight:1.65},
+    footer:{background:"#1A3F6F",color:"#D6E4F7",fontSize:".57rem",textAlign:"center",padding:"8px 18px",marginTop:14},
+  };
+
+  // ── render helpers ─────────────────────────────────────
+  const Sec=(title,children,mt=15)=>h("div",{style:{...C.sec,marginTop:mt}},
+    h("div",{style:C.sttl},title,h("div",{style:C.ln})),
+    children
+  );
+
+  const Tabs=(opts,val,set)=>h("div",{style:C.tabs},
+    opts.map(([v,l])=>h("div",{key:v,style:C.tab(val===v),onClick:()=>set(v)},l))
+  );
+
+  return h("div",{style:C.page},
+
+    // HEADER
+    h("div",{style:C.hdr},
+      h("div",null,
+        h("div",{style:C.h1},"⚡ Monitor Reforma Tributária"),
+        h("div",{style:C.hsub},"Financeiro · Contabilidade · Split Payment · Grupo Veste")
+      ),
+      h("div",null,
+        h("div",{style:{background:"#3972B4",color:"#fff",fontSize:".65rem",fontWeight:700,letterSpacing:"1.5px",padding:"5px 12px",borderRadius:4}},"V E S T E"),
+        h("div",{style:C.hdate},today)
+      )
+    ),
+
+    // RESUMO EXECUTIVO
+    h("div",{style:{background:"#1A3F6F",borderTop:"1px solid #2E588C",padding:"12px 22px"}},
+      h("div",{style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}},
+        [
+          h("div",{style:{background:"rgba(255,255,255,0.07)",borderRadius:8,padding:"10px 14px",borderLeft:"3px solid #D32F2F"}},
+            h("div",{style:{fontSize:".6rem",color:"#90b8e8",fontWeight:600,marginBottom:4,textTransform:"uppercase",letterSpacing:".8px"}},"📅 Prazo Crítico Mais Próximo"),
+            h("div",{style:{fontSize:"1.3rem",fontWeight:800,color:"#fff",lineHeight:1.1}},"03/08/2026"),
+            h("div",{style:{fontSize:".62rem",color:"#D6E4F7",marginTop:3}},"NF-e IBS/CBS obrigatória")
+          ),
+
+          h("div",{style:{background:"rgba(255,255,255,0.07)",borderRadius:8,padding:"10px 14px",borderLeft:"3px solid "+(done===CK.length?"#1E7E4A":"#F0A500")}},
+            h("div",{style:{fontSize:".6rem",color:"#90b8e8",fontWeight:600,marginBottom:4,textTransform:"uppercase",letterSpacing:".8px"}},"✅ Checklist Concluído"),
+            h("div",{style:{fontSize:"1.3rem",fontWeight:800,color:"#fff",lineHeight:1.1}},done+"/"+CK.length),
+            h("div",{style:{fontSize:".62rem",color:"#D6E4F7",marginTop:3}},"itens de preparação")
+          ),
+          h("div",{style:{background:"rgba(255,255,255,0.07)",borderRadius:8,padding:"10px 14px",borderLeft:"3px solid "+(done<4?"#D32F2F":done<8?"#F0A500":"#1E7E4A")}},
+            h("div",{style:{fontSize:".6rem",color:"#90b8e8",fontWeight:600,marginBottom:4,textTransform:"uppercase",letterSpacing:".8px"}},"🔴 Status Geral"),
+            h("div",{style:{fontSize:"1.3rem",fontWeight:800,color:"#fff",lineHeight:1.1}},done<4?"Crítico":done<8?"Atenção":"Em preparo"),
+            h("div",{style:{fontSize:".62rem",color:"#D6E4F7",marginTop:3}},done<4?"Checklist em aberto — inicie a preparação":done<8?"Preparação em andamento":"Bem encaminhado")
+          ),
+        ]
+      )
+    ),
+    // CRONOGRAMA
+    Sec("📅 Cronograma da Reforma",
+      h("div",{style:C.tlWrap},
+        TL.map((t,i)=>h("div",{key:i,style:C.tlItem},
+          i<TL.length-1&&h("div",{style:C.tlArrow},"→"),
+          h("div",{style:{margin:"0 7px",padding:"11px 11px",borderRadius:8,border:"1.5px solid",
+            borderColor:tlColors[t.tipo].border,background:tlColors[t.tipo].bg,
+            ...(t.tipo==="futuro"?{opacity:.85}:{})}},
+            h("div",{style:{fontSize:"1.1rem",fontWeight:800,marginBottom:2,color:tlAnoColor[t.tipo]}},t.ano),
+            h("div",{style:{display:"inline-block",fontSize:".55rem",fontWeight:700,letterSpacing:1,textTransform:"uppercase",padding:"2px 6px",borderRadius:3,marginBottom:5,...tlBadgeStyle[t.tipo]}},t.status),
+            h("div",{style:{fontSize:".68rem",lineHeight:1.48,marginBottom:6,color:"#4D4D4F"}},t.desc),
+            h("div",{style:{display:"flex",flexDirection:"column",gap:3}},
+              t.tags.map((a,j)=>h("div",{key:j,style:{fontSize:".59rem",padding:"2px 6px",borderRadius:3,fontWeight:600,...tlTagStyle[t.tipo]}},"▸ "+a))
+            )
+          )
+        ))
+      )
+    ),
+
+    // ALERTAS
+    Sec("🚨 Alertas e Prazos Vigentes",
+      h("div",null,
+        Tabs([["todos","Todos"],["critico","⚡ Ação Imediata"],["alto","⚠️ Alta Prioridade"],["medio","👁 Monitorar"]],tabAlerta,setTabAlerta),
+        h("div",{style:C.aGrid},
+          af.map((a,i)=>h("div",{key:i,style:{...C.card,borderLeft:"4px solid "+urgColor[a.u]}},
+            h("div",{style:{fontSize:".53rem",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:3,color:urgColor[a.u]}},urgLabel(a.u)),
+            h("div",{style:C.ctitulo},a.t),
+            h("div",{style:C.cdesc},a.d),
+            h("div",{style:C.prazo},"📌 Prazo: "+a.p)
+          ))
+        )
+      )
+    ),
+
+    // IMPACTOS
+    Sec("⚠️ Impactos no Financeiro e Contabilidade",
+      h("div",null,
+        Tabs([["todos","Todos"],["cr","💰 Contas a Receber"],["cp","🧾 Contas a Pagar"]],tabImpacto,setTabImpacto),
+        h("div",{style:C.grid2},
+          impF.map((imp,i)=>h("div",{key:i,style:{...C.card,borderLeft:"4px solid "+nivelColor[imp.n],display:"flex",flexDirection:"column"}},
+            h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3}},
+              h("div",{style:{fontSize:".52rem",fontWeight:700,letterSpacing:1,textTransform:"uppercase",color:nivelColor[imp.n]}},nivelLabel(imp.n)),
+              h("div",{style:{fontSize:".54rem",fontWeight:700,padding:"2px 7px",borderRadius:3,
+                background:imp.area==="cr"?"#EEF3FA":"#FFF8EC",
+                color:imp.area==="cr"?"#1A3F6F":"#7a5200"}},
+                imp.area==="cr"?"💰 C. Receber":"🧾 C. Pagar"
+              )
+            ),
+            h("div",{style:C.prevBadge},"🗓 "+imp.prev),
+            h("div",{style:C.ctitulo},imp.t),
+            h("div",{style:C.cdesc},imp.d)
+          ))
+        )
+      )
+    ),
+
+    // CONVERGÊNCIA
+    Sec("✅ O que Continua Igual — Pontos de Convergência",
+      h("div",null,
+        h("div",{style:{fontSize:".68rem",color:"#888",marginBottom:12}},"O que já existe hoje e funciona a favor da empresa na virada para o novo modelo."),
+        h("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:8}},
+          [
+            {icone:"🏦",t:"Liquidação centralizada na conta da matriz",d:"Sim — o Manual de Integração v1.0 prevê que o domicílio bancário pode ser configurado na matriz, independentemente de qual filial emitiu a NF-e. O grupo registra uma conta única no CGIBS para receber o líquido de todas as filiais da mesma raiz CNPJ. Ação: confirmar o cadastro de domicílio bancário no CGIBS antes de 2027.",ok:true},
+            {icone:"📄",t:"NF-e e NFC-e continuam sendo a base",d:"Os documentos fiscais eletrônicos que a empresa já emite hoje (NF-e, NFC-e) continuam sendo o elo central do sistema. O split payment apenas acrescenta novos campos de vinculação ao XML — o processo de emissão não muda estruturalmente.",ok:true},
+            {icone:"💳",t:"Pix, boleto e cartão continuam sendo os meios",d:"Os meios de pagamento atuais são exatamente os canais do split: Pix, boleto, TEF, TED e cartões. Não há necessidade de adotar novos meios — os PSPs (bancos, gateways) que já processam esses pagamentos serão responsáveis pela segregação automática.",ok:true},
+            {icone:"📊",t:"Não-cumulatividade mantida — crédito garantido",d:"A lógica de crédito tributário nas compras (insumos, mercadorias para revenda) é mantida no IBS e na CBS. O que muda é o mecanismo: o crédito passa a ser financeiro (confirmado após o pagamento), não apenas escritural. Para quem já apura crédito de PIS/Cofins, a lógica base é familiar.",ok:true},
+            {icone:"🔄",t:"Antecipação de recebíveis: principal segue, retenção do tributo muda",d:"NOVO: o split retém CBS+IBS no momento em que o cliente final paga cada parcela — não quando a empresa antecipa o recebível ao banco. O fluxo do principal (valor da venda) continua: banco antecipa hoje, empresa recebe hoje. O que muda é que o tributo sobre cada parcela só é segregado quando o cliente efetuar o pagamento. Decreto 12.955/2026 (art. 31, III).",ok:true},
+            {icone:"🧾",t:"SPED e escrituração contábil seguem o mesmo modelo",d:"As obrigações contábeis (ECD, ECF, EFD) permanecem. O que muda é a parametrização dos novos tributos no plano de contas. A estrutura de escrituração, os prazos e a lógica de apuração já conhecidos pela equipe contábil continuam válidos.",ok:true},
+            {icone:"🏪",t:"Regime de Caixa e Competência inalterados",d:"As regras de reconhecimento de receita (regime de competência para Lucro Real, regime de caixa para Simples) não mudam com a Reforma. O que muda é quando o tributo é segregado — mas o reconhecimento contábil da receita segue as mesmas normas atuais.",ok:true},
+            {icone:"📋",t:"Contratos em vigor têm proteção transitória",d:"A Reforma prevê que contratos firmados antes da vigência do IBS/CBS não geram inadimplência por cláusulas tributárias antigas durante o período de transição. Porém, recomenda-se incluir cláusula de revisão tributária em novos contratos e renovações.",ok:true},
+            {icone:"🔗",t:"ERP existente é a base — não precisa trocar",d:"O ERP atual é o ponto de partida — não é necessário substituí-lo. O que é necessário é um diagnóstico de parametrização: novos campos de CBS/IBS no XML das NFs, integração com PSP para envio de dados tributários e adaptação das rotinas de conciliação.",ok:true},
+          ].map((g,i)=>h("div",{key:i,style:{background:g.ok?"#E8F5EE":"#fff",borderRadius:8,padding:"11px 14px",
+            border:"1.5px solid "+(g.ok?"#1E7E4A":"#D1DCF0"),
+            borderLeft:"3px solid "+(g.ok?"#1E7E4A":"#3972B4"),
+            display:"flex",flexDirection:"column",gap:4}},
+            h("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:2}},
+              h("span",{style:{fontSize:"1rem"}},g.icone),
+              h("div",{style:{fontSize:".75rem",fontWeight:700,color:"#1A3F6F"}},g.t),
+              h("span",{style:{fontSize:".58rem",fontWeight:700,color:"#1E7E4A",marginLeft:"auto",whiteSpace:"nowrap",background:"#C8EDD6",padding:"2px 7px",borderRadius:3}},"✓ Mantido")
+            ),
+            h("div",{style:{fontSize:".69rem",lineHeight:1.55,color:"#4D4D4F"}},g.d)
+          ))
+        )
+      )
+    ,16),
+    // PENALIDADES
+    Sec("⚖️ Penalidades — O que a Lei Prevê",
+      h("div",null,
+        h("div",{style:{background:"#FFF8EC",border:"1.5px solid #F0A500",borderRadius:8,padding:"10px 14px",fontSize:".68rem",color:"#7a5200",marginBottom:14,lineHeight:1.6}},
+          "⚠️ Em 2026: sem multa imediata — ano pedagógico. Se lavrado auto de infração, empresa tem 60 dias para corrigir e penalidade é extinta sem multa (LC 227/2026, art. 348 §§3º e 4º). A partir de 2027: regime sancionatório pleno entra em vigor."
+        ),
+        h("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:9}},
+          [
+            {nivel:"critico",titulo:"NF-e emitida sem destaque de IBS/CBS",
+             quando:"Emissor de NF-e não atualiza o sistema para incluir os campos obrigatórios de IBS/CBS após ago/2026. Fornecedor recusa a nota — venda travada ou crédito do comprador cancelado.",
+             base:"Até 20% do valor da operação por nota irregular",
+             agrav:"Até 30% com reincidência, fraude ou dolo",
+             prazo:"A partir de 03/08/2026",fonte:"STF Tema 487 / NT 2025.002 / LC 227/2026"},
+            {nivel:"critico",titulo:"Crédito de IBS/CBS aproveitado sem direito",
+             quando:"Empresa registra crédito de IBS/CBS de NF-e com erro, de fornecedor irregular ou de operação não sujeita ao tributo. O Fisco detecta na apuração e estorna com multa.",
+             base:"Estorno integral do crédito + multa sobre o valor indevido",
+             agrav:"Majoração de 50% em reincidência — pode chegar a 150%",
+             prazo:"A partir de jan/2027",fonte:"LC 227/2026, art. 341-G, XV"},
+            {nivel:"alto",titulo:"Não cadastramento no CGIBS",
+             quando:"Empresa não registra domicílio bancário no CGIBS para receber o líquido do split payment. O sistema não consegue segregar o tributo corretamente e o valor pode ficar bloqueado ou ser retido em excesso.",
+             base:"Multa fixa em UPF: R$ 200/unidade por evento, corrigido pelo IPCA anualmente",
+             agrav:"Cumulável por filial não cadastrada — grupos multimarca têm risco amplificado",
+             prazo:"A partir de 2026",fonte:"LC 214/2025, art. 341-C / Ato Conjunto RFB/CGIBS nº 02/2026"},
+            {nivel:"alto",titulo:"Dupla autuação — tributo + obrigação acessória",
+             quando:"Mesma NF-e irregular pode gerar dois autos simultâneos: um pelo tributo não recolhido e outro pela obrigação acessória descumprida. A LC 214/2025 permite ambos para a mesma situação.",
+             base:"Dois autos independentes — valores somados sobre a mesma operação",
+             agrav:"Contestado juridicamente (STF Tema 487), mas legislação ainda permite a cumulação",
+             prazo:"A partir de jan/2027",fonte:"LC 214/2025, art. 331 / LC 227/2026"},
+            {nivel:"medio",titulo:"Sonegação, fraude ou conluio",
+             quando:"Empresa omite operações sujeitas a IBS/CBS, declara valores menores do que os reais ou constrói esquema para reduzir artificialmente a base de cálculo.",
+             base:"Até 100% do tributo de referência",
+             agrav:"Até 150% em caso de reincidência específica",
+             prazo:"A partir de jan/2027",fonte:"STF Tema 863 / LC 227/2026"},
+            {nivel:"ok",titulo:"2026: Período pedagógico — use a seu favor",
+             quando:"Em 2026, se lavrado auto de infração por obrigação acessória de IBS/CBS, a empresa recebe notificação com 60 dias para corrigir. Se corrigir no prazo, a penalidade é extinta sem multa. É a janela para ajustar sistemas, cadastros e processos sem custo.",
+             base:"Notificação + 60 dias para correção = penalidade extinta",
+             agrav:"Após jan/2027 não há mais esse benefício — regime pleno entra em vigor",
+             prazo:"Todo 2026",fonte:"LC 227/2026, art. 348 §§3º e 4º / Ato Conjunto RFB/CGIBS nº 1/2025"},
+          ].map((p,i)=>h("div",{key:i,style:{background:"#fff",borderRadius:9,padding:"12px 14px",border:"1.5px solid #D1DCF0",
+            borderLeft:"4px solid "+(p.nivel==="critico"?"#D32F2F":p.nivel==="alto"?"#F0A500":p.nivel==="medio"?"#3972B4":"#1E7E4A"),
+            display:"flex",flexDirection:"column",gap:4}},
+            h("div",{style:{fontSize:".54rem",fontWeight:700,letterSpacing:1,textTransform:"uppercase",
+              color:p.nivel==="critico"?"#D32F2F":p.nivel==="alto"?"#F0A500":p.nivel==="medio"?"#3972B4":"#1E7E4A"}},
+              p.nivel==="critico"?"🔴 Risco Crítico":p.nivel==="alto"?"🟡 Risco Alto":p.nivel==="medio"?"🔵 Risco Médio":"✅ Oportunidade"),
+            h("div",{style:{fontSize:".78rem",fontWeight:700,color:"#1A3F6F",marginBottom:2}},p.titulo),
+            h("div",{style:{fontSize:".68rem",color:"#4D4D4F",lineHeight:1.5,marginBottom:4,fontStyle:"italic"}},p.quando),
+            h("div",{style:{fontSize:".68rem",color:"#4D4D4F",lineHeight:1.5}},
+              h("span",{style:{fontWeight:700,color:"#1A3F6F"}},"💰 Multa: "),p.base),
+            h("div",{style:{fontSize:".68rem",color:"#4D4D4F",lineHeight:1.5}},
+              h("span",{style:{fontWeight:700,color:"#D32F2F"}},"⚠️ Agravante: "),p.agrav),
+            h("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginTop:4}},
+              h("span",{style:{fontSize:".6rem",fontWeight:700,color:"#1A3F6F",background:"#EEF3FA",padding:"2px 7px",borderRadius:3}},"📅 "+p.prazo),
+              h("span",{style:{fontSize:".58rem",color:"#888",background:"#F7F7F7",padding:"2px 6px",borderRadius:3,fontStyle:"italic"}},"📋 "+p.fonte)
+            )
+          ))
+        )
+      )
+    ,16),
+
+    // RISCOS
+    Sec("⚡ Riscos de Não se Preparar — Impacto Financeiro",
+      h("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:9}},
+        [
+          {nivel:"critico",titulo:"Perda de crédito de IBS/CBS por NF irregular",impacto:"Perda integral do crédito tributário da operação",valor:"Até 26,7% do valor da NF",prazo:"A partir de 2027",acao:"Qualificar base de fornecedores e validar CNPJ antes de cada pagamento"},
+          {nivel:"critico",titulo:"NF-e fora do padrão após ago/2026",impacto:"Rejeição eletrônica do documento fiscal — venda não reconhecida",valor:"100% do valor da NF rejeitada",prazo:"03/08/2026",acao:"Atualizar emissor de NF-e para NT 2025.002 até julho/2026"},
+          {nivel:"critico",titulo:"ERP não adaptado ao split em 2027",impacto:"Conciliação manual, erros de caixa e risco de duplo pagamento",valor:"Custo operacional 3–5x maior",prazo:"Jan/2027",acao:"Iniciar diagnóstico de ERP imediatamente"},
+          {nivel:"alto",titulo:"Não renegociar capital de giro antes de 2027",impacto:"Float de ~40 dias eliminado sem reserva de liquidez",valor:"~26,7% do faturamento sujeito ao split",prazo:"2º sem/2026",acao:"Abrir negociação com bancos para linha preventiva antes da virada"},
+          {nivel:"alto",titulo:"Benefícios fiscais de ICMS sem plano de saída",impacto:"Extinção abrupta de incentivos estaduais a partir de 2028",valor:"2–6% da margem operacional",prazo:"Mapear até 2026",acao:"Inventariar benefícios e negociar alternativas com estados"},
+          {nivel:"alto",titulo:"Comparativos de DRE distorcidos 2026–2028",impacto:"Queda aparente de receita e margem sem causa real de negócio",valor:"Distorção de 2–5% no DRE de comparação",prazo:"A partir de 2027",acao:"Criar linha de conciliação tributária paralela no DRE"},
+          {nivel:"medio",titulo:"Fornecedores no Simples — perda de crédito",impacto:"Menor transferência de crédito CBS/IBS na cadeia",valor:"1–3% de redução na margem de contribuição",prazo:"A partir de 2027",acao:"Mapear fornecedores no Simples e avaliar impacto por categoria"},
+          {nivel:"medio",titulo:"Antecipação de recebíveis: base de cálculo reduzida pelo split",impacto:"Com o split, a empresa recebe NF − CBS − IBS (não mais o valor bruto). A base de antecipação cai, o spread sobre valor menor sobe proporcionalmente — quem não recalcular subestima o custo real da operação",valor:"Custo financeiro subestimado em ~14% a.a.",prazo:"A partir de 2027",acao:"Recalcular o custo de antecipação sobre o valor líquido (NF − CBS − IBS) e renegociar linhas com o banco antes de 2027"},
+        ].map((r,i)=>h("div",{key:i,style:{background:"#fff",borderRadius:9,padding:"13px 15px",border:"1.5px solid #D1DCF0",
+          borderLeft:"4px solid "+(r.nivel==="critico"?"#D32F2F":r.nivel==="alto"?"#F0A500":"#3972B4")}},
+          h("div",{style:{fontSize:".54rem",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:4,
+            color:r.nivel==="critico"?"#D32F2F":r.nivel==="alto"?"#F0A500":"#3972B4"}},
+            r.nivel==="critico"?"🔴 Risco Crítico":r.nivel==="alto"?"🟡 Risco Alto":"🔵 Risco Médio"),
+          h("div",{style:{fontSize:".78rem",fontWeight:700,color:"#1A3F6F",marginBottom:5}},r.titulo),
+          h("div",{style:{fontSize:".68rem",color:"#4D4D4F",marginBottom:5,lineHeight:1.5}},r.impacto),
+          h("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:6}},
+            h("span",{style:{fontSize:".6rem",fontWeight:700,background:"#FFF3F3",color:"#D32F2F",padding:"2px 7px",borderRadius:3}},"💰 "+r.valor),
+            h("span",{style:{fontSize:".6rem",fontWeight:700,background:"#EEF3FA",color:"#1A3F6F",padding:"2px 7px",borderRadius:3}},"📅 "+r.prazo)
+          ),
+          h("div",{style:{fontSize:".65rem",color:"#2E588C",background:"#F0F4FA",padding:"6px 9px",borderRadius:5,borderLeft:"2px solid #3972B4"}},
+            "✅ Ação: "+r.acao)
+        ))
+      )
+    ,16),
+
+    // GLOSSÁRIO    // ASSISTENTE
+    Sec("🤖 Assistente de Novidades",
+      h("div",{style:C.iaBox},
+        h("div",{style:C.iaHd},
+          h("div",{style:{color:"#fff",fontSize:".82rem",fontWeight:700}},"Consulte atualizações da Reforma Tributária"),
+          h("div",{style:{color:"#D6E4F7",fontSize:".64rem",marginTop:2}},"EC 132/2023 · LC 214/2025 · RFB · CGIBS · Manual Split Payment v1.0")
+        ),
+        h("div",{style:{padding:"13px 15px"}},
+
+
+          // TABS ESTATICAS
+          h("div",{style:{marginBottom:12}},
+            h("div",{style:{...C.tabs,marginBottom:0}},
+              PRELOAD_CHIPS.map(pc=>h("div",{key:pc.key,
+                style:C.tab(activeTab===pc.key),
+                onClick:()=>setActiveTab(pc.key)},
+                pc.label
+              ))
+            ),
+            h("div",{style:{marginTop:10,background:"#EEF3FA",borderLeft:"3px solid #3972B4",borderRadius:"0 8px 8px 0",padding:"12px 14px"}},
+              h("div",{style:{fontSize:".57rem",color:"#3972B4",fontWeight:700,marginBottom:7,letterSpacing:".5px"}},
+                "RESUMO — "+PRELOAD_CHIPS.find(p=>p.key===activeTab)?.label
+              ),
+              ...STATIC_RESPOSTAS[activeTab].split("\n").filter(l=>l.trim()).map((l,i)=>
+                h("p",{key:i,style:{margin:"4px 0",color:"#4D4D4F",fontSize:".72rem",lineHeight:1.65}},l)
+              )
+            )
+          ),
+
+
+        )
+      )
+    ,16),
+    // CHECKLIST
+    Sec("✅ Checklist — Financeiro / Contabilidade",
+      h("div",null,
+        h("div",{style:{...C.sttl,marginBottom:10}},
+          h("span",{style:{color:"#3972B4",fontWeight:700,fontSize:".66rem"}},done+"/"+CK.length+" concluídos")
+        ),
+        h("div",{style:C.gridCk},
+          CK.map((c,i)=>h("div",{key:i,style:C.ckItem(checks[i]),onClick:()=>toggleCk(i)},
+            h("div",{style:C.ckBox(checks[i])},"✓"),
+            h("div",null,
+              h("span",{style:{fontSize:".71rem",fontWeight:700,color:"#1A3F6F",display:"block",marginBottom:1}},c.t),
+              h("span",{style:{fontSize:".65rem",lineHeight:1.4,color:"#4D4D4F"}},c.d)
+            )
+          ))
+        )
+      )
+    ),
+    // GLOSSÁRIO
+    Sec("📖 Glossário da Reforma Tributária",
+      h("div",null,
+        h("div",{style:{fontSize:".68rem",color:"#888",marginBottom:12}},"Termos técnicos explicados para quem está chegando agora na Reforma Tributária."),
+        h("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:8}},
+          [
+            {t:"IBS — Imposto sobre Bens e Serviços",d:"Substitui o ICMS (estadual) e o ISS (municipal). Componente subnacional do novo IVA dual. Entra gradualmente a partir de 2027 e será pleno em 2033."},
+            {t:"CBS — Contribuição sobre Bens e Serviços",d:"Substitui o PIS e o Cofins. Componente federal do IVA dual. Entra em vigor pleno em janeiro de 2027, quando PIS e Cofins são extintos."},
+            {t:"IVA Dual",d:"O Brasil adotou dois tributos no lugar de cinco: CBS (federal) + IBS (estadual/municipal). Juntos formam o IVA dual — equivalente ao IVA europeu, dividido entre esferas de governo."},
+            {t:"IS — Imposto Seletivo",d:"Novo tributo federal sobre produtos prejudiciais à saúde ou ao meio ambiente (cigarros, bebidas alcoólicas, veículos, etc.). Regulamentação setorial ainda em elaboração."},
+            {t:"Split Payment",d:"Mecanismo que divide automaticamente o pagamento no momento da transação: o banco/gateway retém CBS e IBS e repassa apenas o valor líquido ao vendedor. O tributo nunca entra no caixa da empresa."},
+            {t:"Float Tributário",d:"Período entre a venda e o vencimento da guia de imposto, durante o qual a empresa usava o dinheiro do tributo como capital de giro. O split payment elimina esse float — o tributo é retido na hora da transação."},
+            {t:"vlPago",d:"Campo do split payment: valor total pago pelo cliente na transação (equivale ao valor da NF-e)."},
+            {t:"vlCbsSegr",d:"Campo do split payment: parcela do CBS segregada pelo PSP e destinada à Receita Federal. Não entra no caixa do vendedor."},
+            {t:"vlIbsSegr",d:"Campo do split payment: parcela do IBS segregada pelo PSP e destinada ao CGIBS (estados e municípios). Não entra no caixa do vendedor."},
+            {t:"vlCbsCorr",d:"Campo do split payment: valor de CBS a corrigir/compensar caso haja diferença entre o tributo calculado e o efetivamente segregado na liquidação."},
+            {t:"vlIbsCorr",d:"Campo do split payment: valor de IBS a corrigir/compensar. Usado para ajustes de arredondamento ou divergência entre NF e pagamento."},
+            {t:"vlAberto",d:"Campo do split payment: valor ainda não liquidado da transação (ex: parcelas futuras de cartão a prazo). Controla o saldo pendente de segregação."},
+            {t:"PSP — Prestador de Serviço de Pagamento",d:"Banco, fintech ou gateway responsável por processar a transação e executar a segregação do CBS/IBS. Exemplos: Cielo, Stone, PagSeguro, bancos tradicionais."},
+            {t:"CGIBS — Comitê Gestor do IBS",d:"Órgão colegiado criado pela Reforma para gerir o IBS em nome dos estados e municípios. Equivalente da Receita Federal para o componente subnacional. Publicou o Ato Conjunto nº 02/2026."},
+            {t:"Plataforma Pública de Split Payment",d:"Hub tecnológico desenvolvido por RFB, SERPRO, CGIBS e PROCERGS que conecta os PSPs aos entes governamentais para transmissão dos dados de segregação em tempo real."},
+            {t:"NF-e Vinculada",d:"Exigência do split: cada transação de pagamento precisa estar associada a uma Nota Fiscal Eletrônica válida. Sem vinculação NF-e ↔ pagamento, o crédito de IBS/CBS é cancelado automaticamente."},
+            {t:"Apuração Dual",d:"Período 2028–2032 em que empresas apuram dois sistemas simultaneamente: ICMS/ISS (em extinção) e IBS/CBS (em crescimento). Aumenta custo de compliance e risco de erros."},
+            {t:"Regime de Transição",d:"Período 2026–2033 em que tributos antigos são extintos gradualmente enquanto IBS e CBS crescem proporcionalmente. Carga total neutra, mas estrutura completamente nova."},
+            {t:"Crédito Financeiro",d:"Com a Reforma, o crédito de IBS/CBS só é aproveitado após confirmação do pagamento via split — diferente do crédito escritural atual, reconhecido na contabilidade independente do pagamento."},
+            {t:"Split Inteligente Online",d:"Modalidade em que a NF-e é vinculada à transação em tempo real. O PSP recebe os campos de segregação já calculados e retém o tributo na liquidação imediatamente."},
+            {t:"FCBF — Fundo de Compensação de Benefícios Fiscais",d:"Mecanismo criado pela EC 132/2023 para compensar empresas titulares de incentivos fiscais de ICMS impactadas pela extinção gradual desses benefícios durante a transição para o IBS. Compensação ativa entre 2029 e 2032, com aportes escalonados da União. Habilitação: jan/2026 a dez/2028 via e-CAC. Empresas elegíveis: aquelas com benefícios onerosos de ICMS concedidos até 31/mai/2023, regularmente registrados."},
+            {t:"Simples Híbrido",d:"Modalidade criada pela Reforma para empresas do Simples Nacional que optarem por recolher CBS e IBS separadamente do DAS. Permite aproveitamento de créditos de IBS/CBS na cadeia, tornando essas empresas mais competitivas como fornecedoras. Opção: set/2026. Vigência: jan/2027. Contrapartida: maior complexidade de apuração."},
+            {t:"tpIntegra — Tipo de Integração do Pagamento",d:"Campo da NF-e que informa se o pagamento foi processado dentro ou fora do sistema emissor da nota. Valor 1 = Pagamento Integrado (TEF/POS conectado ao emissor — ex: loja física). Valor 2 = Pagamento Não Integrado (captura ocorre em sistema externo ao emissor — ex: gateway de e-commerce, Matriz capturando para Filial). Com o Split Payment, este campo ganha relevância crítica: tpIntegra=2 indica ao PSP que a segregação precisará de protocolo especial de vinculação entre o ID da transação e a NF-e."},
+            {t:"tPag — Tipo de Pagamento (NF-e)",d:"Campo da NF-e que identifica o meio de pagamento real utilizado pelo cliente. Principais valores: 01=Dinheiro, 03=Cartão de Crédito, 04=Cartão de Débito, 15=Boleto Bancário, 17=Pix, 99=Outros. Com o Split Payment, este campo deixa de ser apenas informativo e passa a ser o gatilho para o PSP identificar qual arranjo de pagamento deve fazer a segregação de IBS/CBS. Divergência entre tPag declarado e o meio real pode causar segregação incorreta ou perda de crédito."},
+            {t:"indPag — Indicador de Forma de Pagamento",d:"Campo da NF-e que indica se o pagamento é à vista (0) ou a prazo (1). No e-commerce com captura prévia ao faturamento, deve ser sempre 1 = A prazo, pois o pagamento ocorre em momento anterior ou diferente da emissão da nota fiscal — mesmo que financeiramente já tenha sido capturado."},
+            {t:"DFe — Documento Fiscal Eletrônico",d:"Termo genérico para qualquer documento fiscal eletrônico: NF-e (Nota Fiscal Eletrônica), NFC-e (Nota Fiscal de Consumidor Eletrônica), CT-e (Conhecimento de Transporte), entre outros. Com o Split Payment, o DFe passa a ser o elo central da segregação tributária: o PSP precisa vincular cada transação de pagamento ao DFe correspondente para calcular e reter corretamente o IBS e a CBS."},
+            {t:"Vinculação DFe ↔ Pagamento (NT 2026.001)",d:"Novo requisito técnico do Split Payment: cada transação de pagamento deve ser formalmente vinculada ao DFe (NF-e) que originou a venda. A NT 2026.001 criou os campos e eventos de vinculação e cancelamento. Em 2026 é preparatório (sem efeito regulatório). A obrigatoriedade em produção será definida por ato conjunto CGIBS/RFB. Para e-commerce com captura prévia ao faturamento (Matriz→Filial), exige fluxo reverso: o ID da transação capturada precisa ser transmitido ao emissor da NF-e para completar a vinculação após a emissão."},
+            {t:"Vinculação 1:N — Um pagamento, múltiplos DFes",d:"Cenário técnico do Split Payment em que um único pagamento capturado origina mais de uma NF-e (ex: e-commerce com faturamento parcial por CD e por Filial). A NT 2026.001 prevê essa estrutura, mas a regulamentação operacional ainda está pendente. É o cenário mais complexo para grupos com múltiplas filiais e centros de distribuição no e-commerce — exige que o PSP saiba proporcionar a segregação de IBS/CBS por NF-e vinculada."},
+            {t:"Split Inteligente Offline",d:"Modalidade para meios sem integração em tempo real. A vinculação NF-e ↔ pagamento ocorre posteriormente, em processo de conciliação. Mais comum em TEF e transferências internas."},
+            {t:"Split Simplificado",d:"Modalidade de fallback: retém um percentual fixo como tributo, sem vinculação por NF-e. Usado quando as outras modalidades não estão disponíveis."},
+          ].map((g,i)=>h("div",{key:i,style:{background:"#fff",borderRadius:8,padding:"11px 14px",border:"1.5px solid #D1DCF0",borderLeft:"3px solid #3972B4"}},
+            h("div",{style:{fontSize:".75rem",fontWeight:700,color:"#1A3F6F",marginBottom:4}},g.t),
+            h("div",{style:{fontSize:".69rem",lineHeight:1.55,color:"#4D4D4F"}},g.d)
+          ))
+        )
+      )
+    ,16),
+
+
+    // FOOTER
+    h("div",{style:{background:"#1A3F6F",color:"#D6E4F7",fontSize:".58rem",textAlign:"center",padding:"12px 18px",marginTop:14}},
+      h("div",{style:{marginBottom:6,fontSize:".62rem",fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"#90b8e8"}},"📚 Fontes e Referências"),
+      h("div",{style:{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:"6px 16px",marginBottom:8}},
+        [
+          {l:"EC 132/2023 — Emenda Constitucional (base da Reforma)",u:"https://www.planalto.gov.br/ccivil_03/constituicao/emendas/emc/emc132.htm"},
+          {l:"LC 214/2025 — Regulamentação IBS, CBS e IS",u:"https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp214.htm"},
+          {l:"Ato Conjunto RFB/CGIBS nº 02/2026",u:"https://www.in.gov.br/web/dou/-/ato-conjunto-rfb/cgibs-n-2-de-27-de-maio-de-2026"},
+          {l:"Manual de Integração Split Payment v1.0",u:"https://consumo.tributos.gov.br"},
+          {l:"Decreto nº 12.955/2026 — Regulamentação CBS",u:"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2026/decreto/d12955.htm"},
+          {l:"Portal Nacional de Tributação — consumo.tributos.gov.br",u:"https://consumo.tributos.gov.br"},
+          {l:"RFB — Notícias Reforma Tributária",u:"https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2026/junho/receita-federal-e-cgibs-publicaram-hoje-a-documentacao-tecnica-da-plataforma-publica-do-split-payment"},
+          {l:"Ministério da Fazenda — Reforma Tributária",u:"https://www.gov.br/fazenda/pt-br/acesso-a-informacao/acoes-e-programas/reforma-tributaria"},
+          {l:"Taxcel — Split Payment: 12 arranjos e 2 etapas",u:"https://taxcel.com.br/split-payment-reforma-tributaria"},
+          {l:"e-Auditoria — Split Payment: cronograma e impactos",u:"https://www.e-auditoria.com.br/blog/split-payment-reforma-tributaria-o-que-e-como-funciona/"},
+          {l:"Calculadora Contábil — Reforma 2026: ano-teste",u:"https://www.calculadoracontabil.com.br/blog/reforma-tributaria-2026-ano-teste-ibs-cbs"},
+          {l:"Thomson Reuters — Split Payment na Reforma",u:"https://www.thomsonreuters.com.br/pt/tax-accounting/onesource-mastersaf/blog/split-payment-reforma-tributaria.html"},
+        ].map((f,i)=>h("a",{key:i,href:f.u,target:"_blank",style:{color:"#90b8e8",textDecoration:"none",whiteSpace:"nowrap",fontSize:".57rem"}},
+          "· "+f.l
+        ))
+      ),
+      h("div",{style:{borderTop:"1px solid #2E588C",paddingTop:7,fontSize:".55rem",color:"#7a9cc4"}},"Monitor Reforma Tributária · Grupo Veste · Atualizado em 15/Jun/2026 · Conteúdo baseado em fontes oficiais e especializadas — não constitui assessoria jurídica ou tributária.")
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>
